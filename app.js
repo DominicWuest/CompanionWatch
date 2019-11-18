@@ -17,14 +17,14 @@ app.get('/', function(req, res) {
   res.render('index.ejs', {});
 });
 
-app.get('/bulletin', function(req, res) {
-  res.render('bulletin.ejs', {})
+app.get('/watch', function(req, res) {
+  res.render('watch.ejs', {})
 });
 
 var chat = io
-  .of('bulletin')
+  .of('watch')
   .on('connection', function(socket) {
     socket.on('message', function(name, message) {
-      
+
     })
   });
