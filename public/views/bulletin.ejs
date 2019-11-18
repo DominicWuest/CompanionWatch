@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Bulletin Board</title>
+    <script type="text/javascript">
+      var name = prompt('Enter your name');
+    </script>
+    <script src="/js/socket.io.js" charset="utf-8"></script>
+    <script src="/js/bulletin.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="/css/bulletin.css">
+  </head>
+  <body>
+    <main>
+      <ul id="bulletinBoard"></ul>
+      <div class="messageInput">
+        <input type="text" id="message" placeholder="Type your message here...">
+        <button onclick="sendMessage()" name="button">Send</button>
+      </div>
+    </main>
+  </body>
+</html>
