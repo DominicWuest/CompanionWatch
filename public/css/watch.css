@@ -1,0 +1,19 @@
+nav .container {
+  max-width: 95%;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: 8% 92%;
+}
+
+main {
+  height: 100%;
+}
+
+#player {
+  display: block;
+  margin: auto;
+}
