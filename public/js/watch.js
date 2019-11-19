@@ -23,15 +23,15 @@ socket.on('stateChange', function(data) {
 function startVideo() {
   // Start and stop the video
   player.playVideo();
-  player.stopVideo();
+  player.pauseVideo();
   // Add the event listener for stateChange
   player.addEventListener('onStateChange', 'synchPlayerStates');
 }
 
-// Gets called whenever the playerState changes
+// Gets called whenever the player state changes
 function synchPlayerStates(data) {
   // TODO: Sync after buffering
-  if (lastState !== 3) socket.emit('stateChange', [data.data, player.getCurrentTime()]);
-  if (externalChange) externalChange = false;
-  else lastState = data.data;
+  // Only emit stateChange event if the change doesn't come from an emitted event itself and the user stopped or resumed the video
+  if (!externalChange && (data.data === 1 || data.data === 2)) socket.emit('stateChange', [data.data, player.getCurrentTime()]);
+  else externalChange = false;
 }
