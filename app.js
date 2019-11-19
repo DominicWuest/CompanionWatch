@@ -21,10 +21,12 @@ app.get('/watch', function(req, res) {
   res.render('watch.ejs', {})
 });
 
-var chat = io
-  .of('watch')
-  .on('connection', function(socket) {
-    socket.on('message', function(name, message) {
+// Namespace for /watch
+var watch = io.of('/watch')
 
-    })
+watch.on('connection', function(socket) {
+    socket.
+    on('stateChange', function(data) {
+      socket.broadcast.emit('stateChange', data);
+    });
   });
