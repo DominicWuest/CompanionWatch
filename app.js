@@ -36,6 +36,10 @@ var watch = io.of('/watch')
 let lastDuration = 0;
 // An integer indicating the time when the last timeChange was recorded
 let lastDurationTime = 0;
+// A boolean indicating whether the video kept playing since the last time the duration was updated
+let countDuration = false;
+// An integer indicating the last recorded state
+let lastState = 2;
 // An integer indicating the amount of clients which are connected
 let connectedClients = 0;
 
@@ -45,8 +49,21 @@ watch.on('connection', function(socket) {
   connectedClients++;
   socket
   // Gets called whenever the state of one of the clients players changes
-  .on('stateChange', function(data) {
-    socket.broadcast.emit('stateChange', data);
+  .on('stateChange', function(state, duration) {
+    socket.broadcast.emit('stateChange', state);
+    lastState = state;
+    // If the new state is playing
+    if (state === 1) {
+      countDuration = true;
+      lastDuration = duration;
+      lastDurationTime = time.time();
+    }
+    // If the new state is paused
+    else if (state === 2) {
+      countDuration = false;
+      lastDuration = duration;
+      lastDurationTime = time.time();
+    }
   })
   // Gets called whenever a client changes the time of their video
   .on('timeChange', function(data) {
@@ -56,12 +73,24 @@ watch.on('connection', function(socket) {
     // Set the last time whewn the duration was updated to the current time
     lastDurationTime = time.time();
   })
-  // Gets called by clients when they want to sync the time of the video of their player to the ones of the other clients
-  .on('requestTimeSync', function() {
-    if (connectedClients === 1) socket.emit('timeChange', 0);
-    // Sends the current time of the player to the client which requested it
-    else socket.emit('timeChange', lastDuration + time.time() - lastDurationTime);
+  // Gets called by clients when they want to sync the time and state of the video of their player to the ones of the other clients
+  .on('requestSync', function() {
+    // Calulating the time to send to the client
+    let duration;
+    if (countDuration) duration = lastDuration + time.time() - lastDurationTime;
+    else duration = lastDuration;
+    // Sends the current time and state of the player to the client which requested it
+    socket.emit('timeChange', duration);
+    socket.emit('stateChange', lastState);
   })
   // Decrement the amount of connected clients when one disconnects
-  .on('disconnect', function() { connectedClients--; });
+  .on('disconnect', function() {
+    connectedClients--;
+    // Reset important variables when noone is connected
+    if (connectedClients === 0) {
+      countDuration = false;
+      lastDuration = 0;
+      lastState = 2;
+    }
+  });
 });

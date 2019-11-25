@@ -32,8 +32,8 @@ function startVideo() {
   // Start and stop the video
   player.playVideo();
   player.pauseVideo();
-  // Sync the newly connected clients players time with the one of the other clients
-  requestTimeSync();
+  // Sync the newly connected clients players time and state with the one of the other clients
+  socket.emit('requestSync');
   // Add the event listener for stateChange
   player.addEventListener('onStateChange', 'synchPlayerStates');
 }
@@ -42,16 +42,13 @@ function startVideo() {
 function synchPlayerStates(data) {
   let state = data.data;
   // Only emit events if the change doesn't come from an emitted event itself
-  if (externalChange) externalChange = false;
-  // Synch the states of the clients players if the user stopped or resumed the video
-  else if (state === 1 || state === 2) socket.emit('stateChange', data.data);
-  // Synch the time of the clients players if the a users video starts buffering
-  else if (state === 3 && lastState !== -1) socket.emit('timeChange', player.getCurrentTime());
+  if (!externalChange) {
+    // Synch the states of the clients players if the user stopped or resumed the video
+    if (state === 1 || state === 2) socket.emit('stateChange', state, player.getCurrentTime());
+    // Synch the time of the clients players if the users video starts buffering or if the user started playing the video again
+    else if ((state === 3 && lastState !== -1) || (state === 2 && lastState === 1)) socket.emit('timeChange', player.getCurrentTime());
+  }
+  else externalChange = false;
   // Set the last state to the current state
   lastState = state;
-}
-
-// Gets called whenever the page finishes loading in order to sync the time with the one from the other users
-function requestTimeSync() {
-  socket.emit('requestTimeSync');
 }
