@@ -23,7 +23,6 @@ socket
 // Gets called whenever another user changes the time of the video or the user requests to sync the time
 .on('timeChange', function(data) {
   player.seekTo(data, true);
-  if (data !== 0) player.playVideo();
 });
 
 // Event listeners
@@ -47,7 +46,7 @@ function synchPlayerStates(data) {
     // Synch the states of the clients players if the user stopped or resumed the video
     if (state === 1 || state === 2) socket.emit('stateChange', state, player.getCurrentTime());
     // Synch the time of the clients players if the users video starts buffering or if the user started playing the video again
-    else if ((state === 3 && lastState !== -1) || (state === 2 && lastState === 1)) socket.emit('timeChange', player.getCurrentTime());
+    if ((state === 3 && lastState !== -1) || (state === 1 && lastState === 2)) socket.emit('timeChange', player.getCurrentTime());
   }
   else externalChange = false;
   // Set the last state to the current state
