@@ -1,5 +1,5 @@
 // Connect to the socket
-let socket = io.connect('http://localhost:3000/watch');
+let socket = io.connect(window.location.href);
 
 // A boolean indicating whether the change of the state got caused by the user or an external client
 let externalChange = false;
@@ -12,12 +12,13 @@ let lastState = -1;
 socket
 // Gets called whenever the state of the player of any client changes
 .on('stateChange', function(data) {
-  externalChange = true;
+  if (data === player.getPlayerState()) return;
   // Resume the video if the new state is 1 or pause the video if the new state is 2
   switch (data) {
     case 1: player.playVideo(); break;
     case 2: player.pauseVideo(); break;
   }
+  if ([1, 2].includes(data)) externalChange = true;
 })
 // Gets called whenever another user changes the time of the video or the user requests to sync the time
 .on('timeChange', function(data) {
