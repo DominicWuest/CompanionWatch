@@ -7,6 +7,43 @@ let externalChange = false;
 // An integer indicating the last state the player had
 let lastState = -1;
 
+// An integer indicating how many result-videos have been displayed from a query
+let resultCount = 0;
+
+// A constant indicating the amount of times the video search will be executed
+const maxResults = 0;
+
+// The url called when searching for a video
+const searchUrl = 'https://www.googleapis.com/youtube/v3/search';
+// The api-key
+const apiKey = ***REMOVED***;
+
+// Gets called whenever the user searches for a new video
+function onVideoSearch(pageToken = '') {
+  // The string entered by the user
+  let queryString = document.getElementById('videoQuery').value;
+  // The full URL to call for the query
+  let requestUrl = searchUrl + '?part=id,snippet&q=' + encodeURI(queryString).replace(/%20/g, '+') + '&key=' + apiKey + '&pageToken=' + pageToken;
+  // Sending the request
+  axios.get(requestUrl)
+  .then(data=>displayResults(data))
+  .catch(err=>console.log(err));
+}
+
+// Gets called when the results of the query have arrived
+function displayResults(data) {
+  // Clear results div if it is a new query
+  //if (resultCount === 0) void(0);
+  // Get next results if max results hasn't been reached yet
+  if (resultCount++ < maxResults) onVideoSearch(data.data.nextPageToken);
+  // Reset resultCount if the max results have been reached
+  else {
+    resultCount = 0;
+    requestVideo(data.data.items[0].id.videoId)
+  }
+  console.log(data);
+}
+
 // Socket message listeners
 
 socket
@@ -23,6 +60,16 @@ socket
 // Gets called whenever another user changes the time of the video or the user requests to sync the time
 .on('timeChange', function(data) {
   player.seekTo(data, true);
+})
+// Gets called whenever another user requests a new video
+.on('videoChange', function(id) {
+  // Don't change the video if the id is empty
+  if (id === '') return;
+  // Set external change to true as otherwise a state change event would be emitted
+  externalChange = true;
+  // Pause the player and load the new video
+  player.loadVideoById(id);
+  player.pauseVideo();
 });
 
 // Event listeners
@@ -51,4 +98,17 @@ function synchPlayerStates(data) {
   else externalChange = false;
   // Set the last state to the current state
   lastState = state;
+}
+
+// Gets called when the user submits a new video id
+function requestVideo(videoId) {
+  // The current id of the video playing
+  let currentId = player.getVideoUrl().split('=')[1];
+  // If the id doesn't match the current id and it is a valid id
+  if (videoId !== currentId) {
+    player.loadVideoById(videoId);
+    externalChange = true;
+    player.pauseVideo();
+    socket.emit('videoChange', videoId);
+  }
 }

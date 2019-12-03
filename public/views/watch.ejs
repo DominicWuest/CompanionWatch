@@ -7,6 +7,7 @@
     <script defer src="/js/bootstrap.min.js" charset="utf-8"></script>
     <script defer src="/js/socket.io.js" charset="utf-8"></script>
     <script defer src="/js/watch.js" charset="utf-8"></script>
+    <script defer src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <link rel="stylesheet" href="/css/watch.css">
     <link rel="stylesheet" href="/css/bootstrap.min.css">
   </head>
@@ -60,6 +61,10 @@
           });
         }
       </script>
+      <div class="videoSearch">
+        <input type="text" id="videoQuery" placeholder="Search for YouTube videos..." onkeyup="if(event.key==='Enter')onVideoSearch()">
+        <button type="button" name="videoSearch" onclick="onVideoSearch()">Search</button>
+      </div>
     </main>
   </body>
 </html>

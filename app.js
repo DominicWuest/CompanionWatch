@@ -36,6 +36,8 @@ var watch = io.of('/watch')
 let lastDuration = 0;
 // An integer indicating the time when the last timeChange was recorded
 let lastDurationTime = 0;
+// A string indicating the id of the last requested video
+let lastId = '';
 // A boolean indicating whether the video kept playing since the last time the duration was updated
 let countDuration = false;
 // An integer indicating the last recorded state
@@ -79,9 +81,17 @@ watch.on('connection', function(socket) {
     let duration;
     if (countDuration) duration = lastDuration + time.time() - lastDurationTime;
     else duration = lastDuration;
-    // Sends the current time and state of the player to the client which requested it
+    // Sends the current time and state of the player as well as the id of the video currently playing to the client which requested it
     socket.emit('timeChange', duration);
     socket.emit('stateChange', lastState);
+    socket.emit('videoChange', lastId);
+  })
+  // Gets called whenever a user requests a new video
+  .on('videoChange', function(id) {
+    // Refresh the last id
+    lastId = id;
+    // Send the video id to all other users
+    socket.broadcast.emit('videoChange', id);
   })
   // Decrement the amount of connected clients when one disconnects
   .on('disconnect', function() {
