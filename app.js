@@ -37,7 +37,7 @@ let lastDuration = 0;
 // An integer indicating the time when the last timeChange was recorded
 let lastDurationTime = 0;
 // A string indicating the id of the last requested video
-let lastId = '';
+let lastId = 'hMAPyGoqQVw';
 // A boolean indicating whether the video kept playing since the last time the duration was updated
 let countDuration = false;
 // An integer indicating the last recorded state

@@ -17,11 +17,36 @@ main {
   display: block;
   margin: auto;
   position: relative;
-  top: 50%;
+  top: 40%;
   transform: translateY(-50%);
 }
 
 .videoSearch {
+  display: grid;
+  grid-template-columns: 4fr 1fr;
+  grid-column-gap: 30px;
+  padding: 20px;
+  padding-top: 40px;
+  box-sizing: border-box;
+  width: 90vw;
+  margin: 0 auto;
+}
+
+:root {
+  --input-padding-x: 1.5rem;
+  --input-padding-y: 0.75rem;
+}
+
+.form-label-group > input {
+  padding: var(--input-padding-y) var(--input-padding-x);
+  height: auto;
+  border-radius: 2rem;
+}
+
+#resultsDiv {
   position: absolute;
-  bottom: 0;
+  top: 85vh;
+  width: 100vw;
+  box-sizing: border-box;
+  padding: 30px;
 }

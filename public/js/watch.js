@@ -7,11 +7,10 @@ let externalChange = false;
 // An integer indicating the last state the player had
 let lastState = -1;
 
-// An integer indicating how many result-videos have been displayed from a query
-let resultCount = 0;
+// A constant indicating how many results should be returned on a video query
+const maxResults = 10;
 
-// A constant indicating the amount of times the video search will be executed
-const maxResults = 0;
+// An array containing all results of a video query
 
 // The url called when searching for a video
 const searchUrl = 'https://www.googleapis.com/youtube/v3/search';
@@ -20,28 +19,49 @@ const apiKey = ***REMOVED***;
 
 // Gets called whenever the user searches for a new video
 function onVideoSearch(pageToken = '') {
+  // Empty the results div
+  results = [];
   // The string entered by the user
   let queryString = document.getElementById('videoQuery').value;
   // The full URL to call for the query
-  let requestUrl = searchUrl + '?part=id,snippet&q=' + encodeURI(queryString).replace(/%20/g, '+') + '&key=' + apiKey + '&pageToken=' + pageToken;
+  let requestUrl = searchUrl + '?part=id,snippet&q=' + encodeURI(queryString).replace(/%20/g, '+') + '&key=' + apiKey + '&maxResults=' + maxResults + '&pageToken=' + pageToken;
   // Sending the request
   axios.get(requestUrl)
   .then(data=>displayResults(data))
   .catch(err=>console.log(err));
 }
 
-// Gets called when the results of the query have arrived
+// Gets called after calculating all results
 function displayResults(data) {
-  // Clear results div if it is a new query
-  //if (resultCount === 0) void(0);
-  // Get next results if max results hasn't been reached yet
-  if (resultCount++ < maxResults) onVideoSearch(data.data.nextPageToken);
-  // Reset resultCount if the max results have been reached
-  else {
-    resultCount = 0;
-    requestVideo(data.data.items[0].id.videoId)
+  let resultsDiv = document.getElementById('resultsDiv');
+  // Clear results div
+  while (resultsDiv.firstChild) resultsDiv.removeChild(resultsDiv.firstChild);
+  // Iterating over every result to add it to the site
+  for (result of data.data.items) {
+    // Create the div for the new video and add it to the class video
+    let resultDiv = document.createElement('DIV');
+    resultDiv.classList.add('video');
+    // Add an event listener to load the video, create a const so that the id doesn't get dereferenced
+    const id = result.id.videoId;
+    resultDiv.addEventListener('click', function() {
+      // Load video and scroll back to top
+      loadVideoById(id);
+      window.scrollTo(0, 0);
+    });
+    // Creating and adding the thumbnail of the video
+    let thumbnail = document.createElement('IMG');
+    thumbnail.src = result.snippet.thumbnails.default.url;
+    resultDiv.appendChild(thumbnail);
+    // Creating and adding the title for the video
+    let title = document.createElement('H2');
+    title.textContent = result.snippet.title;
+    resultDiv.appendChild(title);
+    // Creating and adding the videos description
+    let description = document.createElement('P');
+    description.textContent = result.snippet.description;
+    // Append the result to the div containing all results
+    resultsDiv.appendChild(resultDiv);
   }
-  console.log(data);
 }
 
 // Socket message listeners
@@ -101,7 +121,7 @@ function synchPlayerStates(data) {
 }
 
 // Gets called when the user submits a new video id
-function requestVideo(videoId) {
+function loadVideoById(videoId) {
   // The current id of the video playing
   let currentId = player.getVideoUrl().split('=')[1];
   // If the id doesn't match the current id and it is a valid id

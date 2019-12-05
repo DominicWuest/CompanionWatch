@@ -41,6 +41,10 @@
       </div>
     </nav>
     <main>
+      <div class="form-label-group videoSearch">
+        <input type="text" id="videoQuery" class="form-control" placeholder="Search for YouTube Videos" onkeyup="if(event.key==='Enter')onVideoSearch()" autocomplete="off">
+        <button type="button" class="btn btn-lg btn-primary btn-block videoSearchButton" name="videoSearch" onclick="onVideoSearch()">Search</button>
+      </div>
       <div id="player"></div>
       <script type="text/javascript">
         var tag = document.createElement('script');
@@ -54,17 +58,13 @@
           player = new YT.Player('player', {
             height: '390',
             width: '640',
-            videoId: 'hMAPyGoqQVw',
             events: {
               'onReady': startVideo
             }
           });
         }
       </script>
-      <div class="videoSearch">
-        <input type="text" id="videoQuery" placeholder="Search for YouTube videos..." onkeyup="if(event.key==='Enter')onVideoSearch()">
-        <button type="button" name="videoSearch" onclick="onVideoSearch()">Search</button>
-      </div>
+      <div id="resultsDiv"></div>
     </main>
   </body>
 </html>
