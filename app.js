@@ -26,7 +26,7 @@ app.get('/', function(req, res) {
 
 // Routing for the page where clients can watch videos together
 app.get('/watch', function(req, res) {
-  res.render('watch.ejs', {})
+  res.render('watch.ejs', {});
 });
 
 // Namespace for /watch
@@ -36,14 +36,29 @@ var watch = io.of('/watch')
 let lastDuration = 0;
 // An integer indicating the time when the last timeChange was recorded
 let lastDurationTime = 0;
-// A string indicating the id of the last requested video
-let lastId = 'hMAPyGoqQVw';
 // A boolean indicating whether the video kept playing since the last time the duration was updated
 let countDuration = false;
+// A string indicating the id of the last requested video
+let lastId = 'hMAPyGoqQVw';
 // An integer indicating the last recorded state
 let lastState = 2;
 // An integer indicating the amount of clients which are connected
 let connectedClients = 0;
+
+// Class for room
+class Room {
+  constructor(roomId) {
+    this.roomId = roomId;
+    this.lastDuration = 0;
+    this.lastDurationTime = 0;
+    this.countDuration = false;
+    this.videoId = 'hMAPyGoqQVw';
+    this.lastState = 2;
+    this.connectedClients = 0;
+  }
+}
+
+// Socket functions
 
 // Gets called when a new clients connects to the socket
 watch.on('connection', function(socket) {
