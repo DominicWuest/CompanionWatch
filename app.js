@@ -65,6 +65,22 @@ watch.on('connection', function(socket) {
   // Increment the amount of connected clients when a new client connects
   connectedClients++;
   socket
+  // Gets called by clients when they want to sync the videoId of their player to the ones of the other clients
+  .on('requestVideoSync', function() {
+    socket.emit('videoChange', lastId);
+  })
+  // Gets called by clients when they want to sync the state of their player to the ones of the other clients
+  .on('requestStateSync', function() {
+    socket.emit('stateChange', lastState);
+  })
+  // Gets called by clients when they want to sync the time of their player to the ones of the other clients
+  .on('requestTimeSync', function() {
+    // Calculating the time to send to the client
+    let duration;
+    if (countDuration) duration = lastDuration + time.time() - lastDurationTime;
+    else duration = lastDuration;
+    socket.emit('timeChange', duration);
+  })
   // Gets called whenever the state of one of the clients players changes
   .on('stateChange', function(state, duration) {
     socket.broadcast.emit('stateChange', state);
@@ -76,11 +92,7 @@ watch.on('connection', function(socket) {
       lastDurationTime = time.time();
     }
     // If the new state is paused
-    else if (state === 2) {
-      countDuration = false;
-      lastDuration = duration;
-      lastDurationTime = time.time();
-    }
+    else if (state === 2) countDuration = false;
   })
   // Gets called whenever a client changes the time of their video
   .on('timeChange', function(data) {
@@ -90,21 +102,12 @@ watch.on('connection', function(socket) {
     // Set the last time whewn the duration was updated to the current time
     lastDurationTime = time.time();
   })
-  // Gets called by clients when they want to sync the time and state of the video of their player to the ones of the other clients
-  .on('requestSync', function() {
-    // Calulating the time to send to the client
-    let duration;
-    if (countDuration) duration = lastDuration + time.time() - lastDurationTime;
-    else duration = lastDuration;
-    // Sends the current time and state of the player as well as the id of the video currently playing to the client which requested it
-    socket.emit('timeChange', duration);
-    socket.emit('stateChange', lastState);
-    socket.emit('videoChange', lastId);
-  })
   // Gets called whenever a user requests a new video
   .on('videoChange', function(id) {
     // Refresh the last id
     lastId = id;
+    // Reset lastDuration and countDuration
+    lastDuration = 0; countDuration = false;
     // Send the video id to all other users
     socket.broadcast.emit('videoChange', id);
   })

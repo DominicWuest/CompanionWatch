@@ -2,10 +2,10 @@
 let socket = io.connect(window.location.href);
 
 // A boolean indicating whether the change of the state got caused by the user or an external client
-let externalChange = false;
+let externalChange = true;
 
-// An integer indicating the last state the player had
-let lastState = -1;
+// An integer indicating the last state the player was in
+let lastState = -2;
 
 // A constant indicating how many results should be returned on a video query
 const maxResults = 10;
@@ -27,8 +27,8 @@ function onVideoSearch(pageToken = '') {
   let requestUrl = searchUrl + '?part=id,snippet&q=' + encodeURI(queryString).replace(/%20/g, '+') + '&key=' + apiKey + '&maxResults=' + maxResults + '&pageToken=' + pageToken;
   // Sending the request
   axios.get(requestUrl)
-  .then(data=>displayResults(data))
-  .catch(err=>console.log(err));
+  .then(data => displayResults(data))
+  .catch(err => console.log(err));
 }
 
 // Gets called after calculating all results
@@ -83,8 +83,6 @@ socket
 })
 // Gets called whenever another user requests a new video
 .on('videoChange', function(id) {
-  // Don't change the video if the id is empty
-  if (id === '') return;
   // Set external change to true as otherwise a state change event would be emitted
   externalChange = true;
   // Pause the player and load the new video
@@ -99,8 +97,9 @@ function startVideo() {
   // Start and stop the video
   player.playVideo();
   player.pauseVideo();
-  // Sync the newly connected clients players time and state with the one of the other clients
-  socket.emit('requestSync');
+  // Sync the newly connected clients players videoId and state with the one of the other clients
+  socket.emit('requestVideoSync');
+  socket.emit('requestStateSync');
   // Add the event listener for stateChange
   player.addEventListener('onStateChange', 'synchPlayerStates');
 }
@@ -113,9 +112,10 @@ function synchPlayerStates(data) {
     // Synch the states of the clients players if the user stopped or resumed the video
     if (state === 1 || state === 2) socket.emit('stateChange', state, player.getCurrentTime());
     // Synch the time of the clients players if the users video starts buffering or if the user started playing the video again
-    if ((state === 3 && lastState !== -1) || (state === 1 && lastState === 2)) socket.emit('timeChange', player.getCurrentTime());
+    if ((state === 3 && lastState !== -1 && lastState !== -2) || (state === 1 && lastState === 2)) socket.emit('timeChange', player.getCurrentTime());
   }
   else externalChange = false;
+  if (lastState === -1 && state === 3) socket.emit('requestTimeSync');
   // Set the last state to the current state
   lastState = state;
 }
@@ -124,7 +124,7 @@ function synchPlayerStates(data) {
 function loadVideoById(videoId) {
   // The current id of the video playing
   let currentId = player.getVideoUrl().split('=')[1];
-  // If the id doesn't match the current id and it is a valid id
+  // If the id doesn't match the current id
   if (videoId !== currentId) {
     player.loadVideoById(videoId);
     externalChange = true;
