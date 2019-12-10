@@ -14,6 +14,8 @@ const maxResults = 10;
 
 // The url called when searching for a video
 const searchUrl = 'https://www.googleapis.com/youtube/v3/search';
+// A string containing all params for the query url
+const urlParams = '&safeSearch=none&type=video&videoEmbeddable=true';
 // The api-key
 const apiKey = ***REMOVED***;
 
@@ -24,7 +26,7 @@ function onVideoSearch(pageToken = '') {
   // The string entered by the user
   let queryString = document.getElementById('videoQuery').value;
   // The full URL to call for the query
-  let requestUrl = searchUrl + '?part=id,snippet&q=' + encodeURI(queryString).replace(/%20/g, '+') + '&key=' + apiKey + '&maxResults=' + maxResults + '&pageToken=' + pageToken;
+  let requestUrl = searchUrl + '?part=id,snippet&q=' + encodeURI(queryString).replace(/%20/g, '+') + '&key=' + apiKey + '&maxResults=' + maxResults + '&pageToken=' + pageToken + urlParams;
   // Sending the request
   axios.get(requestUrl)
   .then(data => displayResults(data))
@@ -50,15 +52,18 @@ function displayResults(data) {
     });
     // Creating and adding the thumbnail of the video
     let thumbnail = document.createElement('IMG');
+    thumbnail.classList.add('thumbnail');
     thumbnail.src = result.snippet.thumbnails.default.url;
     resultDiv.appendChild(thumbnail);
     // Creating and adding the title for the video
     let title = document.createElement('H2');
-    title.textContent = result.snippet.title;
+    title.classList.add('videoTitle');
+    title.innerHTML = result.snippet.title;
     resultDiv.appendChild(title);
     // Creating and adding the videos description
     let description = document.createElement('P');
-    description.textContent = result.snippet.description;
+    description.classList.add('description');
+    description.innerHTML = result.snippet.description;
     // Append the result to the div containing all results
     resultsDiv.appendChild(resultDiv);
   }
@@ -79,6 +84,7 @@ socket
 })
 // Gets called whenever another user changes the time of the video or the user requests to sync the time
 .on('timeChange', function(data) {
+  if (data !== 0) externalChange = true;
   player.seekTo(data, true);
 })
 // Gets called whenever another user requests a new video
