@@ -2,7 +2,7 @@
 let socket = io.connect(window.location.href);
 
 // A boolean indicating whether the change of the state got caused by the user or an external client
-let externalChange = true;
+let externalChange = false;
 
 // An integer indicating the last state the player was in
 let lastState = -2;
@@ -84,13 +84,12 @@ socket
 })
 // Gets called whenever another user changes the time of the video or the user requests to sync the time
 .on('timeChange', function(data) {
-  if (data !== 0) externalChange = true;
+  // If the time isn't zero and the player hasn't started playing yet
+  if (data !== 0 && player.getPlayerState() !== 3) externalChange = true;
   player.seekTo(data, true);
 })
 // Gets called whenever another user requests a new video
 .on('videoChange', function(id) {
-  // Set external change to true as otherwise a state change event would be emitted
-  externalChange = true;
   // Pause the player and load the new video
   player.loadVideoById(id);
   player.pauseVideo();
@@ -98,7 +97,7 @@ socket
 
 // Event listeners
 
-// Gets called as soon as the page is loaded
+// Gets called as soon as the player has finished loading
 function startVideo() {
   // Start and stop the video
   player.playVideo();
