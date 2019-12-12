@@ -11,7 +11,8 @@
     "ejs": "^2.7.2",
     "express": "^4.17.1",
     "socket.io": "^2.3.0",
-    "time": "^0.12.0"
+    "time": "^0.12.0",
+    "url": "^0.11.0"
   },
   "repository": {
     "type": "git",

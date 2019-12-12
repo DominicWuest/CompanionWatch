@@ -1,5 +1,5 @@
 // Connect to the socket
-let socket = io.connect(window.location.href);
+let socket = io.connect(window.location.origin + '/watch', {query : 'ns=' + window.location.href.split('/').slice(-1)[0]});
 
 // A boolean indicating whether the change of the state got caused by the user or an external client
 let externalChange = false;

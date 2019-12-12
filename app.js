@@ -6,6 +6,7 @@ var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var path = require('path');
 var time = require('time');
+var url = require('url');
 
 // ----------- End of Imports -----------
 
@@ -21,11 +22,11 @@ app.set('view engine', 'ejs');
 
 // Routing for the homepage
 app.get('/', function(req, res) {
-  res.render('index.ejs', {});
+  res.render('index.ejs', {rooms : rooms});
 });
 
 // Routing for the page where clients can watch videos together
-app.get('/watch', function(req, res) {
+app.get(new RegExp('/watch/(.+)'), function(req, res) {
   res.render('watch.ejs', {});
 });
 
@@ -45,80 +46,97 @@ let lastState = 2;
 // An integer indicating the amount of clients which are connected
 let connectedClients = 0;
 
-// Class for room
+// Class for rooms
 class Room {
   constructor(roomId) {
     this.roomId = roomId;
     this.lastDuration = 0;
     this.lastDurationTime = 0;
     this.countDuration = false;
-    this.videoId = 'hMAPyGoqQVw';
+    this.lastId = 'hMAPyGoqQVw';
     this.lastState = 2;
     this.connectedClients = 0;
   }
 }
 
+// An array containing all rooms
+let rooms = [new Room('a'), new Room('b')];
+// An array containing all ids of the existing rooms
+let roomIds = ['a', 'b'];
+
 // Socket functions
 
 // Gets called when a new clients connects to the socket
 watch.on('connection', function(socket) {
+  // The room to which the client is connected
+  let room = url.parse(socket.handshake.url, true).query.ns;
+  // Disconnect the user if he joins from an invalid room
+  if (!roomIds.includes(room)) socket.disconnect();
+  else socket.join(room);
+  // Get the object of the users room
+  let roomObject = rooms[roomIds.indexOf(room)];
   // Increment the amount of connected clients when a new client connects
-  connectedClients++;
+  roomObject.connectedClients++;
   socket
   // Gets called by clients when they want to sync the videoId of their player to the ones of the other clients
   .on('requestVideoSync', function() {
-    socket.emit('videoChange', lastId);
+    socket.emit('videoChange', roomObject.lastId);
   })
   // Gets called by clients when they want to sync the state of their player to the ones of the other clients
   .on('requestStateSync', function() {
-    socket.emit('stateChange', lastState);
+    socket.emit('stateChange', roomObject.lastState);
   })
   // Gets called by clients when they want to sync the time of their player to the ones of the other clients
   .on('requestTimeSync', function() {
     // Calculating the time to send to the client
     let duration;
-    if (countDuration) duration = lastDuration + time.time() - lastDurationTime;
-    else duration = lastDuration;
+    if (roomObject.countDuration) duration = roomObject.lastDuration + time.time() - roomObject.lastDurationTime;
+    else duration = roomObject.lastDuration;
     socket.emit('timeChange', duration);
   })
   // Gets called whenever the state of one of the clients players changes
   .on('stateChange', function(state, duration) {
-    socket.broadcast.emit('stateChange', state);
-    lastState = state;
+    socket.broadcast.to(room).emit('stateChange', state);
+    roomObject.lastState = state;
     // If the new state is playing
     if (state === 1) {
-      countDuration = true;
-      lastDuration = duration;
-      lastDurationTime = time.time();
+      roomObject.countDuration = true;
+      roomObject.lastDuration = duration;
+      roomObject.lastDurationTime = time.time();
     }
     // If the new state is paused
-    else if (state === 2) countDuration = false;
+    else if (state === 2) roomObject.countDuration = false;
   })
   // Gets called whenever a client changes the time of their video
   .on('timeChange', function(data) {
-    socket.broadcast.emit('timeChange', data);
+    socket.broadcast.to(room).emit('timeChange', data);
     // Set lastDuration to the current time sent by the user
-    lastDuration = data;
+    roomObject.lastDuration = data;
     // Set the last time whewn the duration was updated to the current time
-    lastDurationTime = time.time();
+    roomObject.lastDurationTime = time.time();
   })
   // Gets called whenever a user requests a new video
   .on('videoChange', function(id) {
     // Refresh the last id
-    lastId = id;
+    roomObject.lastId = id;
     // Reset lastDuration and countDuration
-    lastDuration = 0; countDuration = false;
+    roomObject.lastDuration = 0; roomObject.countDuration = false;
     // Send the video id to all other users
-    socket.broadcast.emit('videoChange', id);
+    socket.broadcast.to(room).emit('videoChange', id);
   })
   // Decrement the amount of connected clients when one disconnects
   .on('disconnect', function() {
-    connectedClients--;
+    roomObject.connectedClients--;
+    /*
+
+      TODO: close room when no clients are connected
+
+    */
     // Reset important variables when noone is connected
-    if (connectedClients === 0) {
-      countDuration = false;
-      lastDuration = 0;
-      lastState = 2;
+    if (roomObject.connectedClients === 0) {
+      roomObject.countDuration = false;
+      roomObject.lastDuration = 0;
+      roomObject.lastState = 2;
     }
   });
 });
