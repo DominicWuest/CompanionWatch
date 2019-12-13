@@ -39,7 +39,12 @@ app.post('/newroom', function(req, res) {
 
 // Routing for the page where clients can watch videos together
 app.get(new RegExp('/watch/(.+)'), function(req, res) {
-  res.render('watch.ejs', {});
+  res.render('roomWatch.ejs', {});
+});
+
+// Routing for the page where users can see all rooms
+app.get('/watch', function(req, res) {
+  res.render('watch.ejs', { rooms : rooms });
 });
 
 // Namespace for /watch

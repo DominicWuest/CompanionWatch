@@ -2,63 +2,9 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title>Watch</title>
-    <script defer src="/js/socket.io.js" charset="utf-8"></script>
-    <script defer src="/js/watch.js" charset="utf-8"></script>
-    <script defer src="/js/jquery.slim.min.js" charset="utf-8"></script>
-    <script defer src="/js/bootstrap.bundle.min.js" charset="utf-8"></script>
-    <script defer src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <link rel="stylesheet" href="/css/watch.css">
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <title>Companion Watch</title>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
-      <div class="container">
-        <a class="navbar-brand" href="#">Start Bootstrap</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-          <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="/">Home
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" onclick="createRoom()">Create Room</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/contact">Contact</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-    <main>
-      <div class="form-label-group videoSearch">
-        <input type="text" id="videoQuery" class="form-control" placeholder="Search for YouTube Videos" onkeyup="if(event.key==='Enter')onVideoSearch()" autocomplete="off">
-        <button type="button" class="btn btn-lg btn-primary btn-block videoSearchButton" name="videoSearch" onclick="onVideoSearch()">Search</button>
-      </div>
-      <div id="player"></div>
-      <script type="text/javascript">
-        var tag = document.createElement('script');
 
-        tag.src = "https://www.youtube.com/iframe_api";
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-        var player;
-        function onYouTubeIframeAPIReady() {
-          player = new YT.Player('player', {
-            height: '390',
-            width: '640',
-            events: {
-              'onReady': startVideo
-            }
-          });
-        }
-      </script>
-      <div id="resultsDiv"></div>
-    </main>
   </body>
 </html>
