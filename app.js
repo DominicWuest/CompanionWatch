@@ -50,28 +50,22 @@ app.get('/watch', function(req, res) {
 // Namespace for /watch
 var watch = io.of('/watch')
 
-// An integer indicating the time of the video which has passed when the last timeChange was recorded
-let lastDuration = 0;
-// An integer indicating the time when the last timeChange was recorded
-let lastDurationTime = 0;
-// A boolean indicating whether the video kept playing since the last time the duration was updated
-let countDuration = false;
-// A string indicating the id of the last requested video
-let lastId = 'hMAPyGoqQVw';
-// An integer indicating the last recorded state
-let lastState = 2;
-// An integer indicating the amount of clients which are connected
-let connectedClients = 0;
-
 // Class for rooms
 class Room {
   constructor(roomId) {
+    // The id of the room
     this.roomId = roomId;
+    // An integer indicating the time of the video which has passed when the last timeChange was recorded
     this.lastDuration = 0;
+    // An integer indicating the time when the last timeChange was recorded
     this.lastDurationTime = 0;
+    // A boolean indicating whether the video kept playing since the last time the duration was updated
     this.countDuration = false;
+    // A string indicating the id of the last requested video
     this.lastId = 'hMAPyGoqQVw';
+    // An integer indicating the last recorded state
     this.lastState = 2;
+    // An integer indicating the amount of clients which are connected
     this.connectedClients = 0;
   }
 }
