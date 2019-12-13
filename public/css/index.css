@@ -1,0 +1,21 @@
+body {
+  width: 100vw;
+  height: 100vh;
+}
+
+html {
+  width: 100vw;
+}
+
+nav {
+  width: 100vw;
+  box-sizing: border-box;
+}
+
+nav .container {
+  max-width: 95%;
+}
+
+a:hover {
+  cursor: pointer;
+}

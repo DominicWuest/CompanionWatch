@@ -10,7 +10,7 @@ let lastState = -2;
 // A constant indicating how many results should be returned on a video query
 const maxResults = 10;
 
-// A function which creates a new room
+// A function which creates a new room and redirects the user to it
 function createRoom() {
   // Send a post request to create a new room
   axios.post('/newroom')

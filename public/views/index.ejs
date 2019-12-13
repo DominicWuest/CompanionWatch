@@ -2,11 +2,48 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title>CompanionWatch</title>
-    <script type="text/javascript" src="/js/socket.io.js"></script>
-    <script type="text/javascript" src="/js/index.js"></script>
+    <title>Watch</title>
+    <script defer src="/js/socket.io.js" charset="utf-8"></script>
+    <script defer src="/js/index.js" charset="utf-8"></script>
+    <script defer src="/js/jquery.slim.min.js" charset="utf-8"></script>
+    <script defer src="/js/bootstrap.bundle.min.js" charset="utf-8"></script>
+    <script defer src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script type="text/javascript">
+      let rooms = <%- JSON.stringify(rooms) %>);
+    </script>
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
   </head>
   <body>
-    <h1>Welcome to CompanionWatch</h1>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+      <div class="container">
+        <a class="navbar-brand" href="/">Companion Watch</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/">Home
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" onclick="createRoom()">Create Room</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/contact">Contact</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <main>
+      <a onclick="createRoom()">Create Room</a>
+      <div class="rooms">
+        <% for (room of rooms) { %>
+          <a href="/watch/<%= room.roomId %>"><%= room.roomId%></a>
+        <% } %>
+      </div>
+    </main>
   </body>
 </html>

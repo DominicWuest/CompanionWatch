@@ -23,13 +23,13 @@ app.set('view engine', 'ejs');
 
 // Routing for the homepage
 app.get('/', function(req, res) {
-  res.render('index.ejs', {rooms : rooms});
+  res.render('index.ejs', { rooms : rooms });
 });
 
 // Routing for creating a new room
 app.post('/newroom', function(req, res) {
   // Create a random string to use as the rooms id
-  let roomId = crypto.randomBytes(3*4).toString('base64');
+  let roomId = crypto.randomBytes(3*4).toString('hex');
   // Ensure it isn't a duplicate id (Altough chance incredibly small, still possible)
   while (roomIds.includes(roomId)) roomId = crypto.randomBytes(3*4).toString('base64');
   rooms.push(new Room(roomId));
@@ -40,11 +40,6 @@ app.post('/newroom', function(req, res) {
 // Routing for the page where clients can watch videos together
 app.get(new RegExp('/watch/(.+)'), function(req, res) {
   res.render('roomWatch.ejs', {});
-});
-
-// Routing for the page where users can see all rooms
-app.get('/watch', function(req, res) {
-  res.render('watch.ejs', { rooms : rooms });
 });
 
 // Namespace for /watch
@@ -141,16 +136,11 @@ watch.on('connection', function(socket) {
   // Decrement the amount of connected clients when one disconnects
   .on('disconnect', function() {
     roomObject.connectedClients--;
-    /*
-
-      TODO: close room when no clients are connected
-
-    */
-    // Reset important variables when noone is connected
+    // Delete the room if no clients are connected
     if (roomObject.connectedClients === 0) {
-      roomObject.countDuration = false;
-      roomObject.lastDuration = 0;
-      roomObject.lastState = 2;
+      let index = roomIds.indexOf(roomObject.roomId);
+      roomIds.splice(index, 1);
+      rooms.splice(index, 1);
     }
   });
 });
