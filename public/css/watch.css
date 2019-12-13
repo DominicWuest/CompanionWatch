@@ -16,6 +16,10 @@ nav .container {
   max-width: 95%;
 }
 
+a:hover {
+  cursor: pointer;
+}
+
 #player {
   display: block;
   margin: auto;

@@ -7,6 +7,7 @@ var io = require('socket.io')(server);
 var path = require('path');
 var time = require('time');
 var url = require('url');
+var crypto = require('crypto');
 
 // ----------- End of Imports -----------
 
@@ -23,6 +24,17 @@ app.set('view engine', 'ejs');
 // Routing for the homepage
 app.get('/', function(req, res) {
   res.render('index.ejs', {rooms : rooms});
+});
+
+// Routing for creating a new room
+app.post('/newroom', function(req, res) {
+  // Create a random string to use as the rooms id
+  let roomId = crypto.randomBytes(3*4).toString('base64');
+  // Ensure it isn't a duplicate id (Altough chance incredibly small, still possible)
+  while (roomIds.includes(roomId)) roomId = crypto.randomBytes(3*4).toString('base64');
+  rooms.push(new Room(roomId));
+  roomIds.push(roomId);
+  res.send('/watch/' + roomId);
 });
 
 // Routing for the page where clients can watch videos together
@@ -71,7 +83,10 @@ watch.on('connection', function(socket) {
   // The room to which the client is connected
   let room = url.parse(socket.handshake.url, true).query.ns;
   // Disconnect the user if he joins from an invalid room
-  if (!roomIds.includes(room)) socket.disconnect();
+  if (!roomIds.includes(room)) {
+    socket.disconnect();
+    return;
+  }
   else socket.join(room);
   // Get the object of the users room
   let roomObject = rooms[roomIds.indexOf(room)];

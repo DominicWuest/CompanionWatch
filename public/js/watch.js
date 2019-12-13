@@ -10,7 +10,13 @@ let lastState = -2;
 // A constant indicating how many results should be returned on a video query
 const maxResults = 10;
 
-// An array containing all results of a video query
+// A function which creates a new room
+function createRoom() {
+  // Send a post request to create a new room
+  axios.post('/newroom')
+  // Redirect the user to the new room
+  .then(data => window.location.href = data.data);
+}
 
 // The url called when searching for a video
 const searchUrl = 'https://www.googleapis.com/youtube/v3/search';
