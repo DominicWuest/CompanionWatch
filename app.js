@@ -8,6 +8,7 @@ var path = require('path');
 var time = require('time');
 var url = require('url');
 var crypto = require('crypto');
+var axios = require('axios');
 
 // ----------- End of Imports -----------
 
@@ -21,6 +22,11 @@ app.set('views', path.join(__dirname, 'public/views'));
 // Set the view engine to ejs
 app.set('view engine', 'ejs');
 
+// The url to which the request has to be sent in order to receive infos about videos by id
+const videoInfoUrl = 'https://www.googleapis.com/youtube/v3/videos';
+// The api-key for the project
+const apiKey = ***REMOVED***;
+
 // Routing for the homepage
 app.get('/', function(req, res) {
   res.render('index.ejs', { rooms : rooms });
@@ -32,8 +38,12 @@ app.post('/newroom', function(req, res) {
   let roomId = crypto.randomBytes(3*4).toString('hex');
   // Ensure it isn't a duplicate id (Altough chance incredibly small, still possible)
   while (roomIds.includes(roomId)) roomId = crypto.randomBytes(3*4).toString('base64');
-  rooms.push(new Room(roomId));
+  // Create the new room object and push it to the rooms and its id to the roomIds array
+  let newRoom = new Room(roomId);
+  rooms.push(newRoom);
   roomIds.push(roomId);
+  // Get and update the snippet for the video playing in the room
+  axios.get(videoInfoUrl + '?part=snippet&key=' + apiKey + '&id=' + newRoom.lastId).then(data => newRoom.snippet = data.data.items[0].snippet);
   res.send('/watch/' + roomId);
 });
 
@@ -66,9 +76,9 @@ class Room {
 }
 
 // An array containing all rooms
-let rooms = [new Room('a'), new Room('b')];
+let rooms = [];
 // An array containing all ids of the existing rooms
-let roomIds = ['a', 'b'];
+let roomIds = [];
 
 // Socket functions
 
@@ -126,6 +136,8 @@ watch.on('connection', function(socket) {
   })
   // Gets called whenever a user requests a new video
   .on('videoChange', function(id) {
+    // Update the snippet of the room
+    axios.get(videoInfoUrl + '?part=snippet&key=' + apiKey + '&id=' + id).then(data => roomObject.snippet = data.data.items[0].snippet);
     // Refresh the last id
     roomObject.lastId = id;
     // Reset lastDuration and countDuration

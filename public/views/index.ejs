@@ -38,10 +38,14 @@
       </div>
     </nav>
     <main>
-      <a onclick="createRoom()">Create Room</a>
+      <div class="buttonWrapper">
+        <button type="button" onclick="createRoom()" class="btn btn-lg btn-primary btn-block">Create Room</button>
+      </div>
       <div class="rooms">
         <% for (room of rooms) { %>
-          <a href="/watch/<%= room.roomId %>"><%= room.roomId%></a>
+          <div class="room">
+            <a class="roomLink" href="/watch/<%= room.roomId %>"><img src="<%= room.snippet.thumbnails.default.url %>" alt="video logo"><%= room.snippet.title %></a><p class="clientCount">Companions: <%= room.connectedClients %></p>
+          </div>
         <% } %>
       </div>
     </main>

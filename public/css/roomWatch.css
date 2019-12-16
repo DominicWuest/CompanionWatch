@@ -69,6 +69,10 @@ a:hover {
   margin-bottom: 20px;
 }
 
+.video:hover {
+  cursor: pointer;
+}
+
 .videoTitle {
   overflow-wrap: break-word;
   word-wrap: break-word;
