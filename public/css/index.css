@@ -16,11 +16,15 @@ nav .container {
   max-width: 95%;
 }
 
+.nav-link {
+  cursor: pointer;
+}
+
 .buttonWrapper {
   margin: 40px;
 }
 
-.rooms {
+#roomWrapper {
   width: 100vw;
   padding: 0 30px;
 }
@@ -46,4 +50,11 @@ nav .container {
 
 .clientCount {
   margin: 5px;
+}
+
+.noRoomsMessage {
+  display: block;
+  font-size: 2rem;
+  margin-top: 60px;
+  text-align: center;
 }

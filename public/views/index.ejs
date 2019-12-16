@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" href="/css/bootstrap.min.css">
   </head>
-  <body>
+  <body onload="checkRooms();">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
       <div class="container">
         <a class="navbar-brand" href="/">Companion Watch</a>
@@ -41,7 +41,7 @@
       <div class="buttonWrapper">
         <button type="button" onclick="createRoom()" class="btn btn-lg btn-primary btn-block">Create Room</button>
       </div>
-      <div class="rooms">
+      <div id="roomWrapper">
         <% for (room of rooms) { %>
           <div class="room">
             <a class="roomLink" href="/watch/<%= room.roomId %>"><img src="<%= room.snippet.thumbnails.default.url %>" alt="video logo"><%= room.snippet.title %></a><p class="clientCount">Companions: <%= room.connectedClients %></p>
