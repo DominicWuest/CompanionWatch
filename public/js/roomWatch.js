@@ -1,4 +1,4 @@
- // Connect to the socket
+// Connect to the socket
 let socket = io.connect(window.location.origin + '/watch', {query : 'ns=' + window.location.href.split('/').slice(-1)[0]});
 
 // A boolean indicating whether the change of the state got caused by the user or an external client
@@ -96,11 +96,9 @@ socket
 })
 // Gets called whenever another user requests a new video
 .on('videoChange', function(id) {
-  // Load the new video
+  // Pause the player and load the new video
   player.loadVideoById(id);
-  externalChange = true;
   player.pauseVideo();
-  player.playVideo();
 });
 
 // Event listeners
@@ -140,6 +138,8 @@ function loadVideoById(videoId) {
   // If the id doesn't match the current id
   if (videoId !== currentId) {
     player.loadVideoById(videoId);
+    externalChange = true;
+    player.pauseVideo();
     socket.emit('videoChange', videoId);
   }
 }
