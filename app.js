@@ -72,6 +72,15 @@ class Room {
     this.lastState = 2;
     // An integer indicating the amount of clients which are connected
     this.connectedClients = 0;
+    // Check that the room wasn't created by a bot after .5 seconds (if the amount of connected users equals zero)
+    var that = this;
+    setTimeout(function() {
+      if (that.connectedClients === 0) {
+        let index = roomIds.indexOf(that.roomId);
+        roomIds.splice(index, 1);
+        rooms.splice(index, 1);
+      }
+    }, 500);
   }
 }
 
