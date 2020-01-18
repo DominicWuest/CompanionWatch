@@ -18,25 +18,14 @@ function createRoom() {
   .then(data => window.location.href = data.data);
 }
 
-// The url called when searching for a video
-const searchUrl = 'https://www.googleapis.com/youtube/v3/search';
-// A string containing all params for the query url
-const urlParams = '&safeSearch=none&type=video&videoEmbeddable=true';
-// The api-key
-const apiKey = ***REMOVED***;
-
 // Gets called whenever the user searches for a new video
-function onVideoSearch(pageToken = '') {
+function onVideoSearch() {
   // Empty the results div
   results = [];
   // The string entered by the user
   let queryString = document.getElementById('videoQuery').value;
-  // The full URL to call for the query
-  let requestUrl = searchUrl + '?part=id,snippet&q=' + encodeURI(queryString).replace(/%20/g, '+') + '&key=' + apiKey + '&maxResults=' + maxResults + '&pageToken=' + pageToken + urlParams;
-  // Sending the request
-  axios.get(requestUrl)
-  .then(data => displayResults(data))
-  .catch(err => console.log(err));
+  // Send the search request over the socket to the server so as to not expose the apiKey
+  socket.emit('videoSearch', queryString);
 }
 
 // Gets called after calculating all results
@@ -45,7 +34,7 @@ function displayResults(data) {
   // Clear results div
   while (resultsDiv.firstChild) resultsDiv.removeChild(resultsDiv.firstChild);
   // Iterating over every result to add it to the site
-  for (result of data.data.items) {
+  for (result of data) {
     // Create the div for the new video and add it to the class video
     let resultDiv = document.createElement('DIV');
     resultDiv.classList.add('video');
@@ -99,7 +88,9 @@ socket
   // Pause the player and load the new video
   player.loadVideoById(id);
   player.pauseVideo();
-});
+})
+// Gets called after the user sent a search request, displays the results
+.on('searchResults', (data) => displayResults(data));
 
 // Event listeners
 

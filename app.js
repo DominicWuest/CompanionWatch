@@ -24,6 +24,10 @@ app.set('view engine', 'ejs');
 
 // The url to which the request has to be sent in order to receive infos about videos by id
 const videoInfoUrl = 'https://www.googleapis.com/youtube/v3/videos';
+// The url to which the request has to be sent in order to search for videos
+const videoSearchUrl = 'https://www.googleapis.com/youtube/v3/search';
+// The parameters for the query
+const videoSearchParams = '&safeSearch=none&type=video&videoEmbeddable=true&maxResults=30';
 // The api-key for the project
 const apiKey = ***REMOVED***;
 
@@ -142,6 +146,15 @@ watch.on('connection', function(socket) {
     roomObject.lastDuration = data;
     // Set the last time whewn the duration was updated to the current time
     roomObject.lastDurationTime = time.time();
+  })
+  // Gets called whenever the user wants to search for a video
+  .on('videoSearch', function(queryString) {
+    // The full URL to call for the query
+    let requestUrl = videoSearchUrl + '?part=id,snippet&q=' + encodeURI(queryString).replace(/%20/g, '+') + videoSearchParams + '&key=' + apiKey;
+    // Sending the request and immediately sending the result to the user
+    axios.get(requestUrl)
+    .then(data => socket.emit('searchResults', data.data.items))
+    .catch(err => console.log(err));
   })
   // Gets called whenever a user requests a new video
   .on('videoChange', function(id) {
