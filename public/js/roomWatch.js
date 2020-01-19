@@ -7,9 +7,6 @@ let externalChange = false;
 // An integer indicating the last state the player was in
 let lastState = -2;
 
-// A constant indicating how many results should be returned on a video query
-const maxResults = 10;
-
 // A function which creates a new room and redirects the user to it
 function createRoom() {
   // Send a post request to create a new room
@@ -64,6 +61,19 @@ function displayResults(data) {
   }
 }
 
+// Gets called when the user submits a new video id
+function loadVideoById(videoId) {
+  // The current id of the video playing
+  let currentId = player.getVideoUrl().split('=')[1];
+  // If the id doesn't match the current id
+  if (videoId !== currentId) {
+    player.loadVideoById(videoId);
+    externalChange = true;
+    player.pauseVideo();
+    socket.emit('videoChange', videoId);
+  }
+}
+
 // Socket message listeners
 
 socket
@@ -96,9 +106,6 @@ socket
 
 // Gets called as soon as the player has finished loading
 function startVideo() {
-  // Start and stop the video
-  player.playVideo();
-  player.pauseVideo();
   // Sync the newly connected clients players videoId and state with the one of the other clients
   socket.emit('requestVideoSync');
   socket.emit('requestStateSync');
@@ -120,17 +127,4 @@ function synchPlayerStates(data) {
   if (lastState === -1 && state === 3) socket.emit('requestTimeSync');
   // Set the last state to the current state
   lastState = state;
-}
-
-// Gets called when the user submits a new video id
-function loadVideoById(videoId) {
-  // The current id of the video playing
-  let currentId = player.getVideoUrl().split('=')[1];
-  // If the id doesn't match the current id
-  if (videoId !== currentId) {
-    player.loadVideoById(videoId);
-    externalChange = true;
-    player.pauseVideo();
-    socket.emit('videoChange', videoId);
-  }
 }

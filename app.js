@@ -40,8 +40,8 @@ app.get('/', function(req, res) {
 app.post('/newroom', function(req, res) {
   // Create a random string to use as the rooms id
   let roomId = crypto.randomBytes(3*4).toString('hex');
-  // Ensure it isn't a duplicate id (Altough chance incredibly small, still possible)
-  while (roomIds.includes(roomId)) roomId = crypto.randomBytes(3*4).toString('base64');
+  // Ensure it isn't a duplicate id
+  while (roomIds.includes(roomId)) roomId = crypto.randomBytes(3*4).toString('hex');
   // Create the new room object and push it to the rooms and its id to the roomIds array
   let newRoom = new Room(roomId);
   rooms.push(newRoom);
