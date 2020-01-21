@@ -44,7 +44,7 @@
       <div id="roomWrapper">
         <% for (room of rooms) { %>
           <div class="room">
-            <a class="roomLink" href="/watch/<%= room.roomId %>"><img src="<%= room.snippet.thumbnails.default.url %>" alt="video logo"><%= room.snippet.title %></a><p class="clientCount">Companions: <%= room.connectedClients %></p>
+            <a class="roomLink" href="/watch/<%= room.roomId %>"><img src="<% if (room.snippet) { %><%= room.snippet.thumbnails.default.url %><% } else { %><%= '/imgs/noThumbnail.png' %><% } %>"><% if (room.snippet) { %><%= room.snippet.title %><% } else { %><%= 'Title not loaded' %><% } %></a><p class="clientCount">Companions: <%= room.connectedClients %></p>
           </div>
         <% } %>
       </div>
