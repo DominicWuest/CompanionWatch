@@ -163,7 +163,7 @@ watch.on('connection', function(socket) {
     // Refresh the last id
     roomObject.lastId = id;
     // Reset lastDuration and countDuration
-    roomObject.lastDuration = 0; roomObject.countDuration = false;
+    roomObject.lastDuration = 0; roomObject.countDuration = true; roomObject.lastDurationTime = time.time();
     // Send the video id to all other users
     socket.broadcast.to(room).emit('videoChange', id);
   })

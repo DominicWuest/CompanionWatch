@@ -107,8 +107,16 @@ function startVideo() {
   // Sync the newly connected clients players videoId and state with the one of the other clients
   socket.emit('requestVideoSync');
   socket.emit('requestStateSync');
-  // Add the event listener for stateChange
-  player.addEventListener('onStateChange', 'synchPlayerStates');
+  // Send a request to sync times after the player has finished loading
+  let timeSyncInterval = setInterval(function() {
+    if (player.getDuration()) {
+      clearInterval(timeSyncInterval);
+      socket.emit('requestTimeSync');
+      if (player.getPlayerState() === 3) socket.emit('stateChange', 1);
+      // Add the event listener for stateChange
+      player.addEventListener('onStateChange', 'synchPlayerStates');
+    }
+  }, 50);
 }
 
 // Gets called whenever the player state changes
@@ -122,7 +130,6 @@ function synchPlayerStates(data) {
     if ((state === 3 && lastState !== -1 && lastState !== -2) || (state === 1 && lastState === 2)) socket.emit('timeChange', player.getCurrentTime());
   }
   else externalChange = false;
-  if (lastState === -1 && state === 3) socket.emit('requestTimeSync');
   // Set the last state to the current state
   lastState = state;
 }
