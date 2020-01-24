@@ -69,7 +69,6 @@ function loadVideoById(videoId) {
   if (videoId !== currentId) {
     player.loadVideoById(videoId);
     externalChange = true;
-    player.pauseVideo();
     socket.emit('videoChange', videoId);
   }
 }
@@ -97,7 +96,6 @@ socket
 .on('videoChange', function(id) {
   // Pause the player and load the new video
   player.loadVideoById(id);
-  player.pauseVideo();
 })
 // Gets called after the user sent a search request, displays the results
 .on('searchResults', (data) => displayResults(data));
