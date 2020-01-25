@@ -90,7 +90,11 @@ socket
 .on('timeChange', function(data) {
   // If the time isn't zero and the player hasn't started playing yet
   if (data !== 0 && player.getPlayerState() !== 3) externalChange = true;
-  player.seekTo(data, true);
+  // If the video has finished
+  if (data >= player.getDuration()) {
+    player.seekTo(0, false);
+    player.pauseVideo();
+  } else player.seekTo(data, true);
 })
 // Gets called whenever another user requests a new video
 .on('videoChange', function(id) {
