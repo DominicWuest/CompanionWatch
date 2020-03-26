@@ -33,7 +33,7 @@ const apiKey = ***REMOVED***;
 
 // Routing for the homepage
 app.get('/', function(req, res) {
-  res.render('index.ejs', { rooms : rooms });
+  res.render('index.ejs', { rooms : publicRooms[0] });
 });
 
 // Routing for creating a new room
@@ -41,11 +41,11 @@ app.post('/newroom', function(req, res) {
   // Create a random string to use as the rooms id
   let roomId = crypto.randomBytes(3*4).toString('hex');
   // Ensure it isn't a duplicate id
-  while (roomIds.includes(roomId)) roomId = crypto.randomBytes(3*4).toString('hex');
-  // Create the new room object and push it to the rooms and its id to the roomIds array
+  while (rooms[1].includes(roomId)) roomId = crypto.randomBytes(3*4).toString('hex');
+  // Create the new room object and push it and its id to the rooms array
   let newRoom = new Room(roomId);
-  rooms.push(newRoom);
-  roomIds.push(roomId);
+  rooms[0].push(newRoom);
+  rooms[1].push(roomId);
   // Get and update the snippet for the video playing in the room
   axios.get(videoInfoUrl + '?part=snippet&key=' + apiKey + '&id=' + newRoom.lastId).then(data => newRoom.snippet = data.data.items[0].snippet);
   res.send('/watch/' + roomId);
@@ -76,37 +76,41 @@ class Room {
     this.lastState = 2;
     // An integer indicating the amount of clients which are connected
     this.connectedClients = 0;
+    // A boolean indicating whether the room should be seen by others or not
+    this.public = false;
     // Check that the room wasn't created by a bot after .5 seconds (if the amount of connected users equals zero)
     var that = this;
     setTimeout(function() {
       if (that.connectedClients === 0) {
-        let index = roomIds.indexOf(that.roomId);
-        roomIds.splice(index, 1);
-        rooms.splice(index, 1);
+        let index = rooms[1].indexOf(that.roomId);
+        rooms[0].splice(index, 1);
+        rooms[1].splice(index, 1);
       }
     }, 500);
   }
 }
 
-// An array containing all rooms
-let rooms = [];
-// An array containing all ids of the existing rooms
-let roomIds = [];
+// An array containing all rooms and their ids rooms[0] -> objects; rooms[1] -> ids
+let rooms = [[], []];
+// An array contining all rooms that should be displayed publicly and their ids
+let publicRooms = [[], []];
 
 // Socket functions
 
 // Gets called when a new clients connects to the socket
 watch.on('connection', function(socket) {
   // The room to which the client is connected
-  let room = url.parse(socket.handshake.url, true).query.ns;
+  let roomId = url.parse(socket.handshake.url, true).query.ns;
   // Disconnect the user if he joins from an invalid room
-  if (!roomIds.includes(room)) {
+  if (!rooms[1].includes(roomId)) {
     socket.disconnect();
     return;
   }
-  else socket.join(room);
+  else socket.join(roomId);
+  // Get the index of the room
+  let index = rooms[1].indexOf(roomId);
   // Get the object of the users room
-  let roomObject = rooms[roomIds.indexOf(room)];
+  let roomObject = rooms[0][index];
   // Increment the amount of connected clients when a new client connects
   roomObject.connectedClients++;
   socket
@@ -167,14 +171,25 @@ watch.on('connection', function(socket) {
     // Send the video id to all other users
     socket.broadcast.to(room).emit('videoChange', id);
   })
+  // Gets called whenever the user changed the visibility of the room
+  .on('changeVisibility', function(public) {
+    roomObject.public = public;
+    if (public) {
+      publicRooms[0].push(roomObject);
+      publicRooms[1].push(roomId);
+    } else {
+      let publicIndex = publicRooms[1].indexOf(roomId);
+      publicRooms[0].splice(publicIndex, 1);
+      publicRooms[1].splice(publicIndex, 1);
+    }
+  })
   // Decrement the amount of connected clients when one disconnects
   .on('disconnect', function() {
     roomObject.connectedClients--;
     // Delete the room if no clients are connected
     if (roomObject.connectedClients === 0) {
-      let index = roomIds.indexOf(roomObject.roomId);
-      roomIds.splice(index, 1);
-      rooms.splice(index, 1);
+      rooms[0].splice(index, 1);
+      rooms[1].splice(index, 1);
     }
   });
 });
