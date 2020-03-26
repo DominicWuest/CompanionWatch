@@ -27,7 +27,7 @@ const videoInfoUrl = 'https://www.googleapis.com/youtube/v3/videos';
 // The url to which the request has to be sent in order to search for videos
 const videoSearchUrl = 'https://www.googleapis.com/youtube/v3/search';
 // The parameters for the query
-const videoSearchParams = '&safeSearch=none&type=video&videoEmbeddable=true&maxResults=30';
+const videoSearchParams = '&safeSearch=none&type=video&videoEmbeddable=true&maxResults=20';
 // The api-key for the project
 const apiKey = ***REMOVED***;
 
