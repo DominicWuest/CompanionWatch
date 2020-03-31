@@ -7,9 +7,11 @@
     <script defer src="/js/roomWatch.js" charset="utf-8"></script>
     <script defer src="/js/jquery.slim.min.js" charset="utf-8"></script>
     <script defer src="/js/bootstrap.bundle.min.js" charset="utf-8"></script>
+    <script defer src="/js/bootstrap-toggle.min.js" charset="utf-8"></script>
     <script defer src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <link rel="stylesheet" href="/css/roomWatch.css">
     <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/roomWatch.css">
+    <link rel="stylesheet" href="/css/bootstrap-toggle.min.css">
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
@@ -39,6 +41,10 @@
         <input type="text" id="videoQuery" class="form-control" placeholder="Search for YouTube Videos" onkeyup="if(event.key==='Enter')onVideoSearch()" autocomplete="off">
         <button type="button" class="btn btn-lg btn-primary btn-block videoSearchButton" name="videoSearch" onclick="onVideoSearch()">Search</button>
       </div>
+      <label class="visibilityToggleWrapper">
+        Room visibility:
+        <input id="visibilityToggle" type="checkbox" data-toggle="toggle" data-on="Public" data-off="Private" onchange="changeVisibility(this.checked);">
+      </label>
       <div id="player"></div>
       <script type="text/javascript">
         var tag = document.createElement('script');

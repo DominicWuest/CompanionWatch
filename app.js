@@ -118,6 +118,10 @@ watch.on('connection', function(socket) {
   .on('requestVideoSync', function() {
     socket.emit('videoChange', roomObject.lastId);
   })
+  // Sends the visibility of the room to the client
+  .on('requestVisibilitySync', function() {
+    socket.emit('visibilityChange', roomObject.public);
+  })
   // Gets called by clients when they want to sync the state of their player to the ones of the other clients
   .on('requestStateSync', function() {
     socket.emit('stateChange', roomObject.lastState);
@@ -132,7 +136,7 @@ watch.on('connection', function(socket) {
   })
   // Gets called whenever the state of one of the clients players changes
   .on('stateChange', function(state, duration) {
-    socket.broadcast.to(room).emit('stateChange', state);
+    socket.broadcast.to(roomId).emit('stateChange', state);
     roomObject.lastState = state;
     // If the new state is playing
     if (state === 1) {
@@ -145,7 +149,7 @@ watch.on('connection', function(socket) {
   })
   // Gets called whenever a client changes the time of their video
   .on('timeChange', function(data) {
-    socket.broadcast.to(room).emit('timeChange', data);
+    socket.broadcast.to(roomId).emit('timeChange', data);
     // Set lastDuration to the current time sent by the user
     roomObject.lastDuration = data;
     // Set the last time whewn the duration was updated to the current time
@@ -169,18 +173,25 @@ watch.on('connection', function(socket) {
     // Reset lastDuration and countDuration
     roomObject.lastDuration = 0; roomObject.countDuration = true; roomObject.lastDurationTime = time.time();
     // Send the video id to all other users
-    socket.broadcast.to(room).emit('videoChange', id);
+    socket.broadcast.to(roomId).emit('videoChange', id);
   })
   // Gets called whenever the user changed the visibility of the room
   .on('changeVisibility', function(public) {
-    roomObject.public = public;
-    if (public) {
-      publicRooms[0].push(roomObject);
-      publicRooms[1].push(roomId);
-    } else {
-      let publicIndex = publicRooms[1].indexOf(roomId);
-      publicRooms[0].splice(publicIndex, 1);
-      publicRooms[1].splice(publicIndex, 1);
+    // Don't do anything if the state itself didn't change
+    if (public !== roomObject.public) {
+      roomObject.public = public;
+      if (public) {
+        // Add room to public rooms array
+        publicRooms[0].push(roomObject);
+        publicRooms[1].push(roomId);
+      } else {
+        // Remove the room from the public rooms array
+        let publicIndex = publicRooms[1].indexOf(roomId);
+        publicRooms[0].splice(publicIndex, 1);
+        publicRooms[1].splice(publicIndex, 1);
+      }
+      // Synchronise visibility between users
+      socket.broadcast.to(roomId).emit('visibilityChange', public);
     }
   })
   // Decrement the amount of connected clients when one disconnects
@@ -190,6 +201,12 @@ watch.on('connection', function(socket) {
     if (roomObject.connectedClients === 0) {
       rooms[0].splice(index, 1);
       rooms[1].splice(index, 1);
+      // Remove the room from the public rooms list if its visibility was public
+      if (roomObject.public) {
+        let publicIndex = publicRooms[1].indexOf(roomId);
+        publicRooms[0].splice(publicIndex, 1);
+        publicRooms[1].splice(publicIndex, 1);
+      }
     }
   });
 });

@@ -101,6 +101,10 @@ socket
   // Pause the player and load the new video
   player.loadVideoById(id);
 })
+// Synchronises shwon visibility for clients
+.on('visibilityChange', function(data) {
+  $('#visibilityToggle').prop('checked', data).change();
+})
 // Gets called after the user sent a search request, displays the results
 .on('searchResults', (data) => displayResults(data));
 
@@ -108,8 +112,9 @@ socket
 
 // Gets called as soon as the player has finished loading
 function startVideo() {
-  // Sync the newly connected clients players videoId and state with the one of the other clients
+  // Sync the newly connected clients players videoId, visibility and state with the one of the other clients
   socket.emit('requestVideoSync');
+  socket.emit('requestVisibilitySync');
   socket.emit('requestStateSync');
   // Send a request to sync times after the player has finished loading
   let timeSyncInterval = setInterval(function() {
@@ -136,4 +141,9 @@ function synchPlayerStates(data) {
   else externalChange = false;
   // Set the last state to the current state
   lastState = state;
+}
+
+// Gets called when the value of the visibility checkbox changes. Sends new visibility status of room
+function changeVisibility(data) {
+  socket.emit('changeVisibility', data);
 }
