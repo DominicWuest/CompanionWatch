@@ -33,7 +33,7 @@ const apiKey = ***REMOVED***;
 
 // Routing for the homepage
 app.get('/', function(req, res) {
-  res.render('index.ejs', { rooms : publicRooms[0] });
+  res.render('index.ejs', { rooms : publicRoomIds.map(roomId => rooms[roomId]) });
 });
 
 // Routing for creating a new room
@@ -41,11 +41,10 @@ app.post('/newroom', function(req, res) {
   // Create a random string to use as the rooms id
   let roomId = crypto.randomBytes(3*4).toString('hex');
   // Ensure it isn't a duplicate id
-  while (rooms[1].includes(roomId)) roomId = crypto.randomBytes(3*4).toString('hex');
+  while (roomId in rooms) roomId = crypto.randomBytes(3*4).toString('hex');
   // Create the new room object and push it and its id to the rooms array
   let newRoom = new Room(roomId);
-  rooms[0].push(newRoom);
-  rooms[1].push(roomId);
+  rooms[roomId] = newRoom;
   // Get and update the snippet for the video playing in the room
   axios.get(videoInfoUrl + '?part=snippet&key=' + apiKey + '&id=' + newRoom.lastId).then(data => newRoom.snippet = data.data.items[0].snippet);
   res.send('/watch/' + roomId);
@@ -81,19 +80,15 @@ class Room {
     // Check that the room wasn't created by a bot after .5 seconds (if the amount of connected users equals zero)
     var that = this;
     setTimeout(function() {
-      if (that.connectedClients === 0) {
-        let index = rooms[1].indexOf(that.roomId);
-        rooms[0].splice(index, 1);
-        rooms[1].splice(index, 1);
-      }
+      if (that.connectedClients === 0) delete rooms[that.roomId];
     }, 500);
   }
 }
 
-// An array containing all rooms and their ids rooms[0] -> objects; rooms[1] -> ids
-let rooms = [[], []];
+// A dictionary whose key is the rooms id and its value the object of the room itself
+let rooms = {};
 // An array contining all rooms that should be displayed publicly and their ids
-let publicRooms = [[], []];
+let publicRoomIds = [];
 
 // Socket functions
 
@@ -102,15 +97,13 @@ watch.on('connection', function(socket) {
   // The room to which the client is connected
   let roomId = url.parse(socket.handshake.url, true).query.ns;
   // Disconnect the user if he joins from an invalid room
-  if (!rooms[1].includes(roomId)) {
+  if (!(roomId in rooms)) {
     socket.disconnect();
     return;
   }
   else socket.join(roomId);
-  // Get the index of the room
-  let index = rooms[1].indexOf(roomId);
   // Get the object of the users room
-  let roomObject = rooms[0][index];
+  let roomObject = rooms[roomId];
   // Increment the amount of connected clients when a new client connects
   roomObject.connectedClients++;
   socket
@@ -181,14 +174,12 @@ watch.on('connection', function(socket) {
     if (public !== roomObject.public) {
       roomObject.public = public;
       if (public) {
-        // Add room to public rooms array
-        publicRooms[0].push(roomObject);
-        publicRooms[1].push(roomId);
+        // Add room id to public rooms array
+        publicRoomIds.push(roomId);
       } else {
-        // Remove the room from the public rooms array
-        let publicIndex = publicRooms[1].indexOf(roomId);
-        publicRooms[0].splice(publicIndex, 1);
-        publicRooms[1].splice(publicIndex, 1);
+        // Remove the room id from the public rooms array
+        let publicIndex = publicRoomIds.indexOf(roomId);
+        publicRoomIds.splice(publicIndex, 1);
       }
       // Synchronise visibility between users
       socket.broadcast.to(roomId).emit('visibilityChange', public);
@@ -199,13 +190,11 @@ watch.on('connection', function(socket) {
     roomObject.connectedClients--;
     // Delete the room if no clients are connected
     if (roomObject.connectedClients === 0) {
-      rooms[0].splice(index, 1);
-      rooms[1].splice(index, 1);
+      delete rooms[roomId];
       // Remove the room from the public rooms list if its visibility was public
       if (roomObject.public) {
-        let publicIndex = publicRooms[1].indexOf(roomId);
-        publicRooms[0].splice(publicIndex, 1);
-        publicRooms[1].splice(publicIndex, 1);
+        let publicIndex = publicRoomIds.indexOf(roomId);
+        publicRoomIds.splice(publicIndex, 1);
       }
     }
   });
