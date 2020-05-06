@@ -5,10 +5,26 @@
     <title>Watch</title>
     <script defer src="/js/socket.io.js" charset="utf-8"></script>
     <script defer src="/js/roomWatch.js" charset="utf-8"></script>
-    <script defer src="/js/jquery.slim.min.js" charset="utf-8"></script>
+    <script defer src="/js/jquery.min.js" charset="utf-8"></script>
     <script defer src="/js/bootstrap.bundle.min.js" charset="utf-8"></script>
     <script defer src="/js/bootstrap-toggle.min.js" charset="utf-8"></script>
     <script defer src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script defer src="/js/jquery.easyui.min.js" charset="utf-8"  onload="
+      $('#playercontainer').resizable({
+        edge: 30,
+        handles: 's',
+        onStartResize: function(e) {
+          $('#player').css('z-index', '-1');
+        },
+        onResize: function(e) {
+          let div = $('.tab-content');
+          div.css('max-height', window.innerHeight - div.position().top - parseInt(div.css('margin-top')));
+        },
+        onStopResize: function(e) {
+          $('#player').css('z-index', '0');
+        }
+      });
+    "></script>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/roomWatch.css">
     <link rel="stylesheet" href="/css/bootstrap-toggle.min.css">
@@ -42,10 +58,12 @@
         <button type="button" class="btn btn-lg btn-primary btn-block videoSearchButton" name="videoSearch" onclick="onVideoSearch()">Search</button>
       </div>
       <label class="visibilityToggleWrapper">
-        Room visibility:
+        <span>Room visibility:</span>
         <input id="visibilityToggle" type="checkbox" data-toggle="toggle" data-on="Public" data-off="Private" onchange="changeVisibility(this.checked);">
       </label>
-      <div id="player"></div>
+      <div id="playercontainer" class="easyui-resizable">
+        <div id="player"></div>
+      </div>
       <script type="text/javascript">
         var tag = document.createElement('script');
 
@@ -64,7 +82,18 @@
           });
         }
       </script>
-      <div id="resultsDiv"></div>
+      <ul id="tabs" class="nav nav-tabs">
+        <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#chat" id="chatTab">Chat</a></li>
+        <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#resultsDiv" id="resultsDivTab">Video Results</a></li>
+        <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#queue" id="queueTab">Queue</a></li>
+        <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#playlist" id="playlistTab">Playlist Controls</a></li>
+      </ul>
+      <div class="tab-content">
+        <div id="chat" class="tab-pane active"></div>
+        <div id="resultsDiv" class="tab-pane"></div>
+        <div id="queue" class="tab-pane"></div>
+        <div id="playlist" class="tab-pane"></div>
+      </div>
     </main>
   </body>
 </html>

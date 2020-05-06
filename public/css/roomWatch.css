@@ -4,7 +4,7 @@ body {
 }
 
 html {
-  overflow-x: hidden;
+  overflow: hidden;
   width: 100vw;
 }
 
@@ -22,14 +22,19 @@ a:hover {
 }
 
 .visibilityToggleWrapper {
-  display: block;
-  position: absolute;
-  left: 50%;
+  display: flex;
+  margin-left: 50%;
   transform: translateX(-50%);
+  align-items: center;
+  justify-content: center;
 }
 
 .visibilityToggleWrapper * {
   display: inline-block;
+}
+
+.visibilityToggleWrapper:first-of-type span {
+  padding-right: 0.5vw;
 }
 
 .toggle-off {
@@ -44,14 +49,18 @@ a:hover {
     border: thin rgba(0, 0, 0, .25) solid;
 }
 
+#playercontainer {
+  max-height: 72vh;
+  overflow: hidden;
+  padding-bottom: 5vh;
+}
+
 #player {
   display: block;
-  margin: auto;
-  position: absolute;
-  top: 35%;
-  transform: translateY(-50%);
+  position: relative;
   left: 50%;
   transform: translateX(-50%);
+  overflow: hidden;
 }
 
 .videoSearch {
@@ -76,12 +85,26 @@ a:hover {
   border-radius: 2rem;
 }
 
-#resultsDiv {
+#tabs {
+  position: absolute;
+  z-index: 2;
   width: 100vw;
-  margin: 0;
-  margin-top: 65vh;
+  border-top: thin solid rgba(0, 0, 0, 0.125);
+  background-color: white;
+}
+
+.tab-content {
+  overflow-y: auto;
   box-sizing: border-box;
-  padding: 30px;
+  margin: 0 auto;
+  margin-top: 5vh;
+  padding: 0 2vh;
+  padding-top: 1vh;
+  width: auto;
+}
+
+#resultsDiv {
+  margin: 0;
 }
 
 .video {

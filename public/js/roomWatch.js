@@ -59,6 +59,11 @@ function displayResults(data) {
     // Append the result to the div containing all results
     resultsDiv.appendChild(resultDiv);
   }
+  // Resize div where videos are displayed in order to display the scrollbar correctly
+  let div = $('.tab-content');
+  div.css('max-height', window.innerHeight - div.position().top - parseInt(div.css('margin-top')));
+  // Focus the tab where results are displayed
+  $('#resultsDivTab').click();
 }
 
 // Gets called when the user submits a new video id
