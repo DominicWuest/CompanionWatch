@@ -81,7 +81,7 @@ class Room {
     var that = this;
     setTimeout(function() {
       if (that.connectedClients === 0) delete rooms[that.roomId];
-    }, 500);
+    }, 1000);
   }
 }
 
