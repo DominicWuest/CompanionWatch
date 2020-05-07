@@ -7,7 +7,6 @@ var io = require('socket.io')(server);
 var path = require('path');
 var time = require('time');
 var url = require('url');
-var crypto = require('crypto');
 var axios = require('axios');
 
 // ----------- End of Imports -----------
@@ -39,9 +38,9 @@ app.get('/', function(req, res) {
 // Routing for creating a new room
 app.post('/newroom', function(req, res) {
   // Create a random string to use as the rooms id
-  let roomId = crypto.randomBytes(3*4).toString('hex');
+  let roomId = Math.random().toString(36).substring(2);
   // Ensure it isn't a duplicate id
-  while (roomId in rooms) roomId = crypto.randomBytes(3*4).toString('hex');
+  while (roomId in rooms) roomId = Math.random().toString(36).substring(2);
   // Create the new room object and push it and its id to the rooms array
   let newRoom = new Room(roomId);
   rooms[roomId] = newRoom;
