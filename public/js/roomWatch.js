@@ -1,3 +1,25 @@
+if (!$.cookie('username')) {
+  bootbox.prompt({
+    title: 'What do they call ye, master?',
+    buttons: {
+      confirm: {
+        label: "'Tis my name",
+        className: 'btn-success'
+      },
+      cancel: {
+        className: 'd-none'
+      }
+    },
+    centerVertical: true,
+    closeButton: false,
+    onEscape: false,
+    callback: function(result) {
+      if (result === null || result.length === 0) return false;
+      $.cookie('username', result, { path : '/watch' });
+    }
+  });
+}
+
 // Connect to the socket
 let socket = io.connect(window.location.origin + '/watch', {query : 'ns=' + window.location.href.split('/').slice(-1)[0]});
 
