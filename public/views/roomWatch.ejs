@@ -17,8 +17,7 @@
           $('#player').css('z-index', '-1');
         },
         onResize: function(e) {
-          let div = $('.tab-content');
-          div.css('max-height', window.innerHeight - div.position().top - parseInt(div.css('margin-top')));
+          adjustTabsMenuHeight();
         },
         onStopResize: function(e) {
           $('#player').css('z-index', '0');
@@ -86,7 +85,7 @@
         <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#chat" id="chatTab">Chat</a></li>
         <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#resultsDiv" id="resultsDivTab">Video Results</a></li>
         <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#queue" id="queueTab">Queue</a></li>
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#playlist" id="playlistTab">Playlist Controls</a></li>
+        <li class="nav-item"><a class="nav-link disabled" data-toggle="tab" href="#playlist" id="playlistTab">Playlist Controls</a></li>
       </ul>
       <div class="tab-content">
         <div id="chat" class="tab-pane active"></div>
@@ -96,4 +95,11 @@
       </div>
     </main>
   </body>
+  <template id="searchResultTemplate">
+    <div class="video">
+      <img class="thumbnail">
+      <h2 class="videoTitle"></h2>
+      <p class=channelName""></p>
+    </div>
+  </template>
 </html>

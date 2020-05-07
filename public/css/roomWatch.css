@@ -110,6 +110,11 @@ a:hover {
 .video {
   display: grid;
   grid-template-columns: 120px 1fr;
+  grid-template-areas:
+    "tn title"
+    "tn cn";
+  grid-column-gap: 20px;
+  grid-row-gap: 5px;
   width: 100%;
   padding-bottom: 20px;
   border-bottom: 2px solid #CCC;
@@ -120,17 +125,21 @@ a:hover {
   cursor: pointer;
 }
 
+.thumbnail {
+  grid-area: tn;
+}
+
 .videoTitle {
+  grid-area: title;
   overflow-wrap: break-word;
   word-wrap: break-word;
-  hyphens: auto;
   display: inline;
   margin: 0;
-  margin-left: 20px;
   font-family: sans-serif;
   font-size: 2rem;
 }
 
-.description {
+.channelName {
+  grid-area: cn;
   font-size: 1rem;
 }

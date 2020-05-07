@@ -30,38 +30,27 @@ function displayResults(data) {
   let resultsDiv = document.getElementById('resultsDiv');
   // Clear results div
   while (resultsDiv.firstChild) resultsDiv.removeChild(resultsDiv.firstChild);
+  // The template for creating new video results
+  let divTemplate = document.getElementById('searchResultTemplate').content.querySelector('div');
   // Iterating over every result to add it to the site
   for (result of data) {
     // Create the div for the new video and add it to the class video
-    let resultDiv = document.createElement('DIV');
-    resultDiv.classList.add('video');
+    let resultDiv = document.importNode(divTemplate, true);
     // Add an event listener to load the video, create a const so that the id doesn't get dereferenced
     const id = result.id.videoId;
     resultDiv.addEventListener('click', function() {
-      // Load video and scroll back to top
       loadVideoById(id);
-      window.scrollTo(0, 0);
     });
-    // Creating and adding the thumbnail of the video
-    let thumbnail = document.createElement('IMG');
-    thumbnail.classList.add('thumbnail');
-    thumbnail.src = result.snippet.thumbnails.default.url;
-    resultDiv.appendChild(thumbnail);
-    // Creating and adding the title for the video
-    let title = document.createElement('H2');
-    title.classList.add('videoTitle');
-    title.innerHTML = result.snippet.title;
-    resultDiv.appendChild(title);
-    // Creating and adding the videos description
-    let description = document.createElement('P');
-    description.classList.add('description');
-    description.innerHTML = result.snippet.description;
+    // Adding the source for the pictrue of the thumbnail of the video
+    resultDiv.querySelector('img').src = result.snippet.thumbnails.default.url;
+    // Adding the title for the video
+    resultDiv.querySelector('h2').innerHTML = result.snippet.title;
+    // Adding the channel title
+    resultDiv.querySelector('p').textContent = result.snippet.channelTitle;
     // Append the result to the div containing all results
     resultsDiv.appendChild(resultDiv);
   }
-  // Resize div where videos are displayed in order to display the scrollbar correctly
-  let div = $('.tab-content');
-  div.css('max-height', window.innerHeight - div.position().top - parseInt(div.css('margin-top')));
+  adjustTabsMenuHeight();
   // Focus the tab where results are displayed
   $('#resultsDivTab').click();
 }
@@ -151,4 +140,10 @@ function synchPlayerStates(data) {
 // Gets called when the value of the visibility checkbox changes. Sends new visibility status of room
 function changeVisibility(data) {
   socket.emit('changeVisibility', data);
+}
+
+// Resizes tabs menu in order to display the scrollbar correctly
+function adjustTabsMenuHeight() {
+  let div = $('.tab-content');
+  div.css('max-height', window.innerHeight - div.position().top - parseInt(div.css('margin-top')));
 }
