@@ -184,6 +184,10 @@ watch.on('connection', function(socket) {
       socket.broadcast.to(roomId).emit('visibilityChange', public);
     }
   })
+  // Gets called whenever a user sends a message
+  .on('newMessage', function(username, message) {
+    socket.broadcast.to(roomId).emit('newMessage', username, message);
+  })
   // Decrement the amount of connected clients when one disconnects
   .on('disconnect', function() {
     roomObject.connectedClients--;

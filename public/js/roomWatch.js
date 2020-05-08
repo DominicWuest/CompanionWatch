@@ -89,6 +89,45 @@ function loadVideoById(videoId) {
   }
 }
 
+// Gets called when the user wants to send a message
+function sendMessage() {
+  // Get the message
+  let message = $('#messageInput').val();
+  // Reset the textfield
+  $('#messageInput').val('');
+  // If the message is empty, don't send anything
+  if (message === '') return;
+  // Get the username
+  let username = $.cookie('username');
+  // Send the message to all other users
+  socket.emit('newMessage', username, message);
+  // Add the message to the users chat tab
+  addMessage(true, username, message);
+}
+
+// Adds the message to the chat tab
+function addMessage(ownMessage, username, message) {
+  let messagesDiv = $('#messages');
+  // Check if user is at bottom of chat
+  let scrollToBottom = false;
+  if (messagesDiv.scrollTop() + messagesDiv.innerHeight() >= messagesDiv[0].scrollHeight) scrollToBottom = true;
+  // Get the correct template
+  if (ownMessage) var template = document.getElementById('ownMessageTemplate');
+  else var template = document.getElementById('foreignMessageTemplate')
+  // Get the template
+  let messageTemplate = template.content.querySelector('.messageWrapper');
+  let messageDiv = document.importNode(messageTemplate, true);
+  // Set the text for the message, username and timestamp
+  messageDiv.querySelector('.speech-bubble').textContent = message;
+  messageDiv.querySelector('.messageName').textContent = username;
+  let date = new Date();
+  messageDiv.querySelector('.timestamp').textContent = date.toTimeString().split(' ')[0].slice(0, 5);
+  // Append the new message
+  messagesDiv.append(messageDiv);
+  // Scroll to bottom if needed
+  if (scrollToBottom) messagesDiv.scrollTop(messagesDiv[0].scrollHeight);
+}
+
 // Socket message listeners
 
 socket
@@ -122,7 +161,9 @@ socket
   $('#visibilityToggle').prop('checked', data).change();
 })
 // Gets called after the user sent a search request, displays the results
-.on('searchResults', (data) => displayResults(data));
+.on('searchResults', (data) => displayResults(data))
+// Gets called whenever another user sends a message
+.on('newMessage', (username, message) => addMessage(false, username, message));
 
 // Event listeners
 

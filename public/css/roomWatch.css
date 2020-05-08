@@ -118,9 +118,88 @@ a:hover {
 }
 
 #messages {
-  height: 100%;
   width: 100%;
-  overflow-y: auto;
+  overflow-y: scroll;
+  padding: 0;
+  padding-right: 3vw;
+}
+
+.messageWrapper {
+  width: 100%;
+  float: left;
+  clear: both;
+}
+
+.messageWrapper h4 {
+  grid-row: 2;
+  display: inline;
+}
+
+.speech-bubble {
+  display: inline-block;
+	position: relative;
+	background: #00aabb;
+	border-radius: .4em;
+  padding: 0.5rem;
+  width: auto;
+  margin-bottom: 1.5vh;
+  word-break: break-all;
+}
+
+.speech-bubble:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border: 0.5em solid transparent;
+  border-top-color: #00aabb;
+  border-bottom: 0;
+  margin-left: -0.25em;
+  margin-bottom: -0.5em;
+}
+
+.own-message h4 {
+  float: right;
+  margin-left: 0.2vw;
+  font-size: 1rem;
+}
+
+.own-message h4:first-of-type {
+  clear: right;
+}
+
+.own-message div {
+  border-bottom-right-radius: 0;
+  float: right;
+}
+
+.own-message .speech-bubble:after {
+  border-right: 0;
+  right: 0;
+}
+
+.foreign-message div {
+  float: left;
+  clear: both;
+  border-bottom-left-radius: 0;
+  margin-left: 
+}
+
+.foreign-message div:after {
+  left: 0;
+  transform: translateX(50%);
+  border-left: 0;
+}
+
+.foreign-message h4 {
+  float: left;
+  margin-right: 0.2vw;
+  font-size: 1rem;
+}
+
+.foreign-message h4:first-of-type {
+  clear: left;
 }
 
 .chatInput {
