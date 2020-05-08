@@ -9,28 +9,30 @@
     <script defer src="/js/bootstrap-toggle.min.js" charset="utf-8"></script>
     <script defer src="/js/jquery.cookie.js" charset="utf-8"></script>
     <script defer src="/js/bootbox.min.js" charset="utf-8"></script>
+    <script defer src="/js/jquery.easyui.min.js" charset="utf-8"></script>
     <script defer src="/js/roomWatch.js" charset="utf-8"></script>
     <script defer src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script defer src="/js/jquery.easyui.min.js" charset="utf-8"  onload="
-      $('#playercontainer').resizable({
-        edge: 30,
-        handles: 's',
-        onStartResize: function(e) {
-          $('#player').css('z-index', '-1');
-        },
-        onResize: function(e) {
-          adjustTabsMenuHeight();
-        },
-        onStopResize: function(e) {
-          $('#player').css('z-index', '0');
-        }
-      });
-    "></script>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/roomWatch.css">
     <link rel="stylesheet" href="/css/bootstrap-toggle.min.css">
+    <link rel="stylesheet" href="/css/roomWatch.css">
   </head>
-  <body>
+  <body onload="
+    adjustTabsMenuHeight();
+
+    $('#playercontainer').resizable({
+      edge: 30,
+      handles: 's',
+      onStartResize: function(e) {
+        $('#player').css('z-index', '-1');
+      },
+      onResize: function(e) {
+        adjustTabsMenuHeight();
+      },
+      onStopResize: function(e) {
+        $('#player').css('z-index', '0');
+      }
+    });
+  ">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
       <div class="container">
         <a class="navbar-brand" href="/">Companion Watch</a>
@@ -90,7 +92,15 @@
         <li class="nav-item"><a class="nav-link disabled" data-toggle="tab" href="#playlist" id="playlistTab">Playlist Controls</a></li>
       </ul>
       <div class="tab-content">
-        <div id="chat" class="tab-pane active"></div>
+        <div id="chat" class="tab-pane active">
+          <div class="chatChild">
+            <div id="messages"></div>
+            <div class="chatInput">
+              <input type="text" id="messageInput" class="form-control" placeholder="Type your message..." onkeyup="if (event.key==='Enter') sendMessage()" autocomplete="off">
+              <button type="button" class="btn btn-lg btn-primary btn-block" name="sendMessage" onclick="sendMessage()"><img src="/imgs/sendMessage.png"></button>
+            </div>
+          </div>
+        </div>
         <div id="resultsDiv" class="tab-pane"></div>
         <div id="queue" class="tab-pane"></div>
         <div id="playlist" class="tab-pane"></div>

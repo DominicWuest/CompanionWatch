@@ -167,5 +167,5 @@ function changeVisibility(data) {
 // Resizes tabs menu in order to display the scrollbar correctly
 function adjustTabsMenuHeight() {
   let div = $('.tab-content');
-  div.css('max-height', window.innerHeight - div.position().top - parseInt(div.css('margin-top')));
+  div.css('height', window.innerHeight - div.position().top - parseInt(div.css('margin-top')));
 }
