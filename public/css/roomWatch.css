@@ -118,6 +118,7 @@ a:hover {
   width: 100%;
   overflow-y: scroll;
   padding: 0;
+  padding-top: 2vh;
   padding-right: 3vw;
 }
 
