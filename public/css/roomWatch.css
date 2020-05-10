@@ -49,11 +49,24 @@ a:hover {
     border: thin rgba(0, 0, 0, .25) solid;
 }
 
+.videoSearch {
+  display: grid;
+  grid-template-columns: 4fr 1fr;
+  grid-column-gap: 30px;
+  padding: 5vh;
+  padding-top: 3vh;
+  height: 5vh;
+  box-sizing: content-box;
+  width: 90vw;
+  margin: 0 auto;
+}
+
 #playercontainer {
-  height: 72vh;
+  height: 100%;
+  padding-bottom: 3vh;
+  box-sizing: border-box;
   max-height: 72vh;
   overflow: hidden;
-  padding-bottom: 5vh;
 }
 
 #player {
@@ -62,17 +75,6 @@ a:hover {
   left: 50%;
   transform: translateX(-50%);
   overflow: hidden;
-}
-
-.videoSearch {
-  display: grid;
-  grid-template-columns: 4fr 1fr;
-  grid-column-gap: 30px;
-  padding: 20px;
-  padding-top: 40px;
-  box-sizing: border-box;
-  width: 90vw;
-  margin: 0 auto;
 }
 
 :root {
@@ -87,8 +89,6 @@ a:hover {
 }
 
 #tabs {
-  position: absolute;
-  z-index: 2;
   width: 100vw;
   border-top: thin solid rgba(0, 0, 0, 0.125);
   background-color: white;
@@ -96,11 +96,8 @@ a:hover {
 
 .tab-content {
   overflow-y: auto;
-  box-sizing: border-box;
   margin: 0 auto;
-  margin-top: 5vh;
   padding: 0;
-  padding-top: 1vh;
   width: auto;
 }
 
@@ -183,7 +180,6 @@ a:hover {
   float: left;
   clear: both;
   border-bottom-left-radius: 0;
-  margin-left: 
 }
 
 .foreign-message div:after {
@@ -223,7 +219,7 @@ a:hover {
 }
 
 #resultsDiv {
-  padding: 0 2vw;
+  padding: 1vh 2vw;
   margin: 0;
 }
 
