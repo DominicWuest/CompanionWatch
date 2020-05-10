@@ -20,6 +20,20 @@ if (!$.cookie('username')) {
   });
 }
 
+// Tell the user to turn on autoplay if they are visiting for the first time
+if (!$.cookie('firstTime')) {
+  bootbox.alert({
+    title: 'Autoplay',
+    message: 'Remember to turn on Autoplay for this website in order for it to work properly!',
+    buttons: {
+      ok: {
+        label: 'Duh'
+      }
+    }
+  });
+  $.cookie('firstTime', '1');
+}
+
 // Connect to the socket
 let socket = io.connect(window.location.origin + '/watch', {query : 'ns=' + window.location.href.split('/').slice(-1)[0]});
 
