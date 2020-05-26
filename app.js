@@ -26,7 +26,7 @@ const videoInfoUrl = 'https://www.googleapis.com/youtube/v3/videos';
 // The url to which the request has to be sent in order to search for videos
 const videoSearchUrl = 'https://www.googleapis.com/youtube/v3/search';
 // The parameters for the query
-const videoSearchParams = '&safeSearch=none&type=video&videoEmbeddable=true&maxResults=20';
+const videoSearchParams = '&safeSearch=none&type=video,playlist&maxResults=20';
 // The api-key for the project
 const apiKey = ***REMOVED***;
 
@@ -70,6 +70,8 @@ class Room {
     this.countDuration = false;
     // A string indicating the id of the last requested video
     this.lastId = 'hMAPyGoqQVw';
+    // A string indicating the last type of content playing
+    this.lastType = 'youtube#video';
     // An integer indicating the last recorded state
     this.lastState = 2;
     // An integer indicating the amount of clients which are connected
@@ -108,7 +110,7 @@ watch.on('connection', function(socket) {
   socket
   // Gets called by clients when they want to sync the videoId of their player to the ones of the other clients
   .on('requestVideoSync', function() {
-    socket.emit('videoChange', roomObject.lastId);
+    socket.emit('videoChange', roomObject.lastId, roomObject.lastType);
   })
   // Sends the visibility of the room to the client
   .on('requestVisibilitySync', function() {
@@ -157,15 +159,17 @@ watch.on('connection', function(socket) {
     .catch(err => console.log(err));
   })
   // Gets called whenever a user requests a new video
-  .on('videoChange', function(id) {
+  .on('videoChange', function(id, type) {
     // Update the snippet of the room
     axios.get(videoInfoUrl + '?part=snippet&key=' + apiKey + '&id=' + id).then(data => roomObject.snippet = data.data.items[0].snippet);
     // Refresh the last id
     roomObject.lastId = id;
+    // Refresh the last content type
+    roomObject.lastType = type;
     // Reset lastDuration and countDuration
     roomObject.lastDuration = 0; roomObject.countDuration = true; roomObject.lastDurationTime = time.time();
     // Send the video id to all other users
-    socket.broadcast.to(roomId).emit('videoChange', id);
+    socket.broadcast.to(roomId).emit('videoChange', id, type);
   })
   // Gets called whenever the user changed the visibility of the room
   .on('changeVisibility', function(public) {

@@ -72,16 +72,22 @@ function displayResults(data) {
   for (result of data) {
     // Create the div for the new video and add it to the class video
     let resultDiv = document.importNode(divTemplate, true);
-    // Add an event listener to load the video, create a const so that the id doesn't get dereferenced
-    const id = result.id.videoId;
-    resultDiv.addEventListener('click', function() {
-      loadVideoById(id);
-    });
-    // Adding the source for the pictrue of the thumbnail of the video
+    // Attach the correct event listener
+    let type = result.id.kind;
+    if (type  === 'youtube#video') {
+      const videoId = result.id.videoId;
+      resultDiv.addEventListener('click', function() {
+        loadVideoById(videoId);
+      });
+    } else if (type === 'youtube#playlist') {
+      const playlistId = result.id.playlistId;
+      resultDiv.addEventListener('click', function() {
+        loadPlaylistById(playlistId);
+      });
+    }
+    // Adding the information of the video
     resultDiv.querySelector('img').src = result.snippet.thumbnails.default.url;
-    // Adding the title for the video
     resultDiv.querySelector('h2').innerHTML = result.snippet.title;
-    // Adding the channel title
     resultDiv.querySelector('p').textContent = result.snippet.channelTitle;
     // Append the result to the div containing all results
     resultsDiv.appendChild(resultDiv);
@@ -97,9 +103,25 @@ function loadVideoById(videoId) {
   let currentId = player.getVideoUrl().split('=')[1];
   // If the id doesn't match the current id
   if (videoId !== currentId) {
+    // Disable the playlist controls tab
+    $('#playlistTab').addClass('disabled');
+    // Load the video
     player.loadVideoById(videoId);
     externalChange = true;
-    socket.emit('videoChange', videoId);
+    socket.emit('videoChange', videoId, 'youtube#video');
+  }
+}
+
+function loadPlaylistById(playlistId) {
+  let currentId = player.getVideoUrl().split('=')[1].slice(0, -2);
+  if (playlistId !== currentId) {
+    // Enable the playlist controls tab
+    $('#playlistTab').removeClass('disabled');
+    // Load the playlist
+    player.loadPlaylist({list : playlistId});
+    //player.playVideo();
+    externalChange = true;
+    socket.emit('videoChange', playlistId, 'youtube#playlist');
   }
 }
 
@@ -166,9 +188,10 @@ socket
   } else player.seekTo(data, true);
 })
 // Gets called whenever another user requests a new video
-.on('videoChange', function(id) {
-  // Pause the player and load the new video
-  player.loadVideoById(id);
+.on('videoChange', function(id, type) {
+  // Correctly load the new content
+  if (type === 'youtube#video') player.loadVideoById(id);
+  else if (type === 'youtube#playlist') player.loadPlaylist({list : id});
 })
 // Synchronises shwon visibility for clients
 .on('visibilityChange', function(data) {
