@@ -142,6 +142,7 @@ watch.on('connection', function(socket) {
       roomObject.countDuration = true;
       roomObject.lastDuration = duration;
       roomObject.lastDurationTime = time.time();
+      if (duration !== roomObject.lastDuration) socket.broadcast.to(roomId).emit('timeChange', duration);
     }
     // If the new state is paused
     else if (state === 2) roomObject.countDuration = false;
