@@ -43,6 +43,12 @@ let externalChange = false;
 // An integer indicating the last state the player was in
 let lastState = -2;
 
+// The video id of the last played video, mainly used to catch video changes when playing playlists
+let lastVideoId = '';
+
+// The last type of content played (youtube#video or youtube#playlist)
+let lastType = '';
+
 // A function which creates a new room and redirects the user to it
 function createRoom() {
   // Send a post request to create a new room
@@ -72,16 +78,22 @@ function displayResults(data) {
   for (result of data) {
     // Create the div for the new video and add it to the class video
     let resultDiv = document.importNode(divTemplate, true);
-    // Add an event listener to load the video, create a const so that the id doesn't get dereferenced
-    const id = result.id.videoId;
-    resultDiv.addEventListener('click', function() {
-      loadVideoById(id);
-    });
-    // Adding the source for the pictrue of the thumbnail of the video
+    // Attach the correct event listener
+    let type = result.id.kind;
+    if (type  === 'youtube#video') {
+      const videoId = result.id.videoId;
+      resultDiv.addEventListener('click', function() {
+        loadVideoById(videoId);
+      });
+    } else if (type === 'youtube#playlist') {
+      const playlistId = result.id.playlistId;
+      resultDiv.addEventListener('click', function() {
+        loadPlaylistById(playlistId);
+      });
+    }
+    // Adding the information of the video
     resultDiv.querySelector('img').src = result.snippet.thumbnails.default.url;
-    // Adding the title for the video
     resultDiv.querySelector('h2').innerHTML = result.snippet.title;
-    // Adding the channel title
     resultDiv.querySelector('p').textContent = result.snippet.channelTitle;
     // Append the result to the div containing all results
     resultsDiv.appendChild(resultDiv);
@@ -93,13 +105,34 @@ function displayResults(data) {
 
 // Gets called when the user submits a new video id
 function loadVideoById(videoId) {
-  // The current id of the video playing
-  let currentId = player.getVideoUrl().split('=')[1];
   // If the id doesn't match the current id
-  if (videoId !== currentId) {
+  if (videoId !== lastVideoId) {
+    // Update the last type
+    lastType = 'youtube#video';
+    // Update the last id
+    let lastId = player.getVideoUrl().split('=')[1];
+    // Disable the playlist controls tab
+    $('#playlistTab').addClass('disabled');
+    // Load the video
     player.loadVideoById(videoId);
     externalChange = true;
-    socket.emit('videoChange', videoId);
+    socket.emit('videoChange', videoId, 'youtube#video');
+  }
+}
+
+function loadPlaylistById(playlistId) {
+  // Get the id of the currently playing playlist
+  let currentId = player.getVideoUrl().split('=')[1].slice(0, -2);
+  if (playlistId !== currentId) {
+    // Update the last type
+    lastType = 'youtube#playlist';
+    // Enable the playlist controls tab
+    $('#playlistTab').removeClass('disabled');
+    // Load the playlist
+    player.loadPlaylist({list : playlistId});
+    //player.playVideo();
+    externalChange = true;
+    socket.emit('videoChange', playlistId, 'youtube#playlist');
   }
 }
 
@@ -166,9 +199,20 @@ socket
   } else player.seekTo(data, true);
 })
 // Gets called whenever another user requests a new video
-.on('videoChange', function(id) {
-  // Pause the player and load the new video
-  player.loadVideoById(id);
+.on('videoChange', function(id, type) {
+  // Correctly load the new content
+  if (type === 'youtube#video') {
+    player.loadVideoById(id);
+    lastType = 'youtube#video';
+  } else if (type === 'youtube#playlist') {
+    player.loadPlaylist({list : id});
+    lastType = 'youtube#playlist';
+  }
+})
+// Gets called whenever another user changes the index of the currently playing playlist video
+.on('playlistIndexChange', function(index) {
+  externalChange = true;
+  player.playVideoAt(index);
 })
 // Synchronises shwon visibility for clients
 .on('visibilityChange', function(data) {
@@ -208,6 +252,8 @@ function synchPlayerStates(data) {
     if (state === 1 || state === 2) socket.emit('stateChange', state, player.getCurrentTime());
     // Synch the time of the clients players if the users video starts buffering or if the user started playing the video again
     if (state === 3 && lastState !== -1 && lastState !== -2) socket.emit('timeChange', player.getCurrentTime());
+    // Catch changes of playlist video
+    if (lastType === 'youtube#playlist' && state === -1) socket.emit('playlistIndexChange', player.getPlaylistIndex());
   }
   else externalChange = false;
   // Set the last state to the current state
