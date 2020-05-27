@@ -43,6 +43,12 @@ let externalChange = false;
 // An integer indicating the last state the player was in
 let lastState = -2;
 
+// The video id of the last played video, mainly used to catch video changes when playing playlists
+let lastVideoId = '';
+
+// The last type of content played (youtube#video or youtube#playlist)
+let lastType = '';
+
 // A function which creates a new room and redirects the user to it
 function createRoom() {
   // Send a post request to create a new room
@@ -99,10 +105,12 @@ function displayResults(data) {
 
 // Gets called when the user submits a new video id
 function loadVideoById(videoId) {
-  // The current id of the video playing
-  let currentId = player.getVideoUrl().split('=')[1];
   // If the id doesn't match the current id
-  if (videoId !== currentId) {
+  if (videoId !== lastVideoId) {
+    // Update the last type
+    lastType = 'youtube#video';
+    // Update the last id
+    let lastId = player.getVideoUrl().split('=')[1];
     // Disable the playlist controls tab
     $('#playlistTab').addClass('disabled');
     // Load the video
@@ -113,8 +121,11 @@ function loadVideoById(videoId) {
 }
 
 function loadPlaylistById(playlistId) {
+  // Get the id of the currently playing playlist
   let currentId = player.getVideoUrl().split('=')[1].slice(0, -2);
   if (playlistId !== currentId) {
+    // Update the last type
+    lastType = 'youtube#playlist';
     // Enable the playlist controls tab
     $('#playlistTab').removeClass('disabled');
     // Load the playlist
@@ -190,8 +201,18 @@ socket
 // Gets called whenever another user requests a new video
 .on('videoChange', function(id, type) {
   // Correctly load the new content
-  if (type === 'youtube#video') player.loadVideoById(id);
-  else if (type === 'youtube#playlist') player.loadPlaylist({list : id});
+  if (type === 'youtube#video') {
+    player.loadVideoById(id);
+    lastType = 'youtube#video';
+  } else if (type === 'youtube#playlist') {
+    player.loadPlaylist({list : id});
+    lastType = 'youtube#playlist';
+  }
+})
+// Gets called whenever another user changes the index of the currently playing playlist video
+.on('playlistIndexChange', function(index) {
+  externalChange = true;
+  player.playVideoAt(index);
 })
 // Synchronises shwon visibility for clients
 .on('visibilityChange', function(data) {
@@ -231,6 +252,8 @@ function synchPlayerStates(data) {
     if (state === 1 || state === 2) socket.emit('stateChange', state, player.getCurrentTime());
     // Synch the time of the clients players if the users video starts buffering or if the user started playing the video again
     if (state === 3 && lastState !== -1 && lastState !== -2) socket.emit('timeChange', player.getCurrentTime());
+    // Catch changes of playlist video
+    if (lastType === 'youtube#playlist' && state === -1) socket.emit('playlistIndexChange', player.getPlaylistIndex());
   }
   else externalChange = false;
   // Set the last state to the current state

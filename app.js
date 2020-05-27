@@ -72,6 +72,8 @@ class Room {
     this.lastId = 'hMAPyGoqQVw';
     // A string indicating the last type of content playing
     this.lastType = 'youtube#video';
+    // An integer indicating the last index of the video played of a playlist
+    this.lastPlaylistIndex = 0;
     // An integer indicating the last recorded state
     this.lastState = 2;
     // An integer indicating the amount of clients which are connected
@@ -111,6 +113,7 @@ watch.on('connection', function(socket) {
   // Gets called by clients when they want to sync the videoId of their player to the ones of the other clients
   .on('requestVideoSync', function() {
     socket.emit('videoChange', roomObject.lastId, roomObject.lastType);
+    if (roomObject.lastType === 'youtube#playlist') socket.emit('playlistIndexChange', roomObject.lastPlaylistIndex);
   })
   // Sends the visibility of the room to the client
   .on('requestVisibilitySync', function() {
@@ -166,10 +169,16 @@ watch.on('connection', function(socket) {
     roomObject.lastId = id;
     // Refresh the last content type
     roomObject.lastType = type;
+    if (type === 'youtube#playlist') roomObject.lastPlaylistIndex = 0
     // Reset lastDuration and countDuration
     roomObject.lastDuration = 0; roomObject.countDuration = true; roomObject.lastDurationTime = time.time();
     // Send the video id to all other users
     socket.broadcast.to(roomId).emit('videoChange', id, type);
+  })
+  // Gets called whenever a user changes the index of the currently playing playlist video
+  .on('playlistIndexChange', function(index) {
+    roomObject.lastPlaylistIndex = index;
+    socket.broadcast.to(roomId).emit('playlistIndexChange', index);
   })
   // Gets called whenever the user changed the visibility of the room
   .on('changeVisibility', function(public) {
