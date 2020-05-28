@@ -23,6 +23,8 @@ app.set('view engine', 'ejs');
 
 // The url to which the request has to be sent in order to receive infos about videos by id
 const videoInfoUrl = 'https://www.googleapis.com/youtube/v3/videos';
+// The url to which the request has to be sent in order to receive infos about playlists by id
+const playlistInfoUrl = 'https://www.googleapis.com/youtube/v3/playlists';
 // The url to which the request has to be sent in order to search for videos
 const videoSearchUrl = 'https://www.googleapis.com/youtube/v3/search';
 // The parameters for the query
@@ -164,7 +166,7 @@ watch.on('connection', function(socket) {
   // Gets called whenever a user requests a new video
   .on('videoChange', function(id, type) {
     // Update the snippet of the room
-    axios.get(videoInfoUrl + '?part=snippet&key=' + apiKey + '&id=' + id).then(data => roomObject.snippet = data.data.items[0].snippet);
+    axios.get(type === 'youtube#video' ? videoInfoUrl : playlistInfoUrl + '?part=snippet&key=' + apiKey + '&id=' + id).then(data => roomObject.snippet = data.data.items[0].snippet);
     // Refresh the last id
     roomObject.lastId = id;
     // Refresh the last content type
