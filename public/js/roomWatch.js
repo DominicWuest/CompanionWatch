@@ -37,8 +37,8 @@ if (!$.cookie('firstTime')) {
 // Connect to the socket
 let socket = io.connect(window.location.origin + '/watch', {query : 'ns=' + window.location.href.split('/').slice(-1)[0]});
 
-// A boolean indicating whether the change of the state got caused by the user or an external client
-let externalChange = false;
+// An indicating whether the change of the state got caused by the user or an external client, positive means external change, negative means internal change
+let externalChange = 0;
 
 // An integer indicating the last state the player was in
 let lastState = -2;
@@ -48,6 +48,9 @@ let lastVideoId = '';
 
 // The last type of content played (youtube#video or youtube#playlist)
 let lastType = '';
+
+// A float indicating the last
+let lastTime = 0;
 
 // A function which creates a new room and redirects the user to it
 function createRoom() {
@@ -115,7 +118,7 @@ function loadVideoById(videoId) {
     $('#playlistTab').addClass('disabled');
     // Load the video
     player.loadVideoById(videoId);
-    externalChange = true;
+    externalChange = 3;
     socket.emit('videoChange', videoId, 'youtube#video');
   }
 }
@@ -130,8 +133,7 @@ function loadPlaylistById(playlistId) {
     $('#playlistTab').removeClass('disabled');
     // Load the playlist
     player.loadPlaylist({list : playlistId});
-    //player.playVideo();
-    externalChange = true;
+    externalChange = 3;
     socket.emit('videoChange', playlistId, 'youtube#playlist');
   }
 }
@@ -191,7 +193,7 @@ socket
 // Gets called whenever another user changes the time of the video or the user requests to sync the time
 .on('timeChange', function(data) {
   // If the time isn't zero and the player hasn't started playing yet
-  if (data !== 0 && player.getPlayerState() !== 3) externalChange = true;
+  if (data !== 0 && player.getPlayerState() !== 3) externalChange = 2;
   // If the video has finished
   if (data >= player.getDuration()) {
     player.seekTo(0, false);
@@ -211,7 +213,7 @@ socket
 })
 // Gets called whenever another user changes the index of the currently playing playlist video
 .on('playlistIndexChange', function(index) {
-  externalChange = true;
+  externalChange = 3;
   player.playVideoAt(index);
 })
 // Synchronises shwon visibility for clients
@@ -247,7 +249,9 @@ function startVideo() {
 function synchPlayerStates(data) {
   let state = data.data;
   // Only emit events if the change doesn't come from an emitted event itself
-  if (!externalChange) {
+  if (externalChange < 1) {
+    if (state === 2) lastTime = player.getCurrentTime();
+    else if (state === 1 && lastTime !== player.getCurrentTime()) socket.emit('timeChange', player.getCurrentTime());
     // Synch the states of the clients players if the user stopped or resumed the video
     if (state === 1 || state === 2) socket.emit('stateChange', state, player.getCurrentTime());
     // Synch the time of the clients players if the users video starts buffering or if the user started playing the video again
@@ -255,7 +259,8 @@ function synchPlayerStates(data) {
     // Catch changes of playlist video
     if (lastType === 'youtube#playlist' && state === -1) socket.emit('playlistIndexChange', player.getPlaylistIndex());
   }
-  else externalChange = false;
+  // Decrement the externalchange variable
+  externalChange--;
   // Set the last state to the current state
   lastState = state;
 }
