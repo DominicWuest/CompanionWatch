@@ -65,16 +65,17 @@ function onVideoSearch() {
   // Empty the results div
   results = [];
   // The string entered by the user
-  let queryString = document.getElementById('videoQuery').value;
+  let queryString = $('#videoQuery').val();
   // Send the search request over the socket to the server so as to not expose the apiKey
   socket.emit('videoSearch', queryString);
 }
 
 // Gets called after calculating all results
 function displayResults(data) {
-  let resultsDiv = document.getElementById('resultsDiv');
+  // Get the div where the results will be displayed
+  let resultsDiv = $('#resultsDiv');
   // Clear results div
-  while (resultsDiv.firstChild) resultsDiv.removeChild(resultsDiv.firstChild);
+  resultsDiv.innerHTML = '';
   // The template for creating new video results
   let divTemplate = document.getElementById('searchResultTemplate').content.querySelector('div');
   // Iterating over every result to add it to the site
@@ -99,7 +100,7 @@ function displayResults(data) {
     resultDiv.querySelector('h2').innerHTML = result.snippet.title;
     resultDiv.querySelector('p').textContent = result.snippet.channelTitle;
     // Append the result to the div containing all results
-    resultsDiv.appendChild(resultDiv);
+    resultsDiv.append(resultDiv);
   }
   adjustTabsMenuHeight();
   // Focus the tab where results are displayed
