@@ -15,7 +15,7 @@ if (!$.cookie('username')) {
     onEscape: false,
     callback: function(result) {
       if (result === null || result.length === 0) return false;
-      $.cookie('username', result, { path : '/watch' });
+      $.cookie('username', result, { path : '/' });
     }
   });
 }
@@ -31,7 +31,7 @@ if (!$.cookie('firstTime')) {
       }
     }
   });
-  $.cookie('firstTime', '1');
+  $.cookie('firstTime', '1', { path : '/' });
 }
 
 // Connect to the socket
