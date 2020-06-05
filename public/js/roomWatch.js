@@ -107,6 +107,11 @@ function displayResults(data) {
   $('#resultsDivTab').click();
 }
 
+// Displays all items of a newly playing playlist under playlist controls
+function displayPlaylistItems(items) {
+  console.log(items);
+}
+
 // Gets called when the user submits a new video id
 function loadVideoById(videoId) {
   // If the id doesn't match the current id
@@ -223,6 +228,8 @@ socket
 })
 // Gets called after the user sent a search request, displays the results
 .on('searchResults', (data) => displayResults(data))
+// Gets called whenever a user changes the video to a playlist, displays the playlist items under playlist controls
+.on('playlistItems', (items) => displayPlaylistItems(items))
 // Gets called whenever another user sends a message
 .on('newMessage', (username, message) => addMessage(false, username, message));
 

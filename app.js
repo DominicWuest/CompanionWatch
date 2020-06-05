@@ -25,6 +25,8 @@ app.set('view engine', 'ejs');
 const videoInfoUrl = 'https://www.googleapis.com/youtube/v3/videos';
 // The url to which the request has to be sent in order to receive infos about playlists by id
 const playlistInfoUrl = 'https://www.googleapis.com/youtube/v3/playlists';
+// The url to which the request has to be sent in order to receive infos about playlists by id
+const playlistItemsUrl = 'https://www.googleapis.com/youtube/v3/playlistItems';
 // The url to which the request has to be sent in order to search for videos
 const videoSearchUrl = 'https://www.googleapis.com/youtube/v3/search';
 // The parameters for the query
@@ -74,6 +76,8 @@ class Room {
     this.lastId = 'hMAPyGoqQVw';
     // A string indicating the last type of content playing
     this.lastType = 'youtube#video';
+    // An array containing all items of the last displayed playlist. Will only be available to user when the playlist is playing
+    this.playlistItems;
     // An integer indicating the last index of the video played of a playlist
     this.lastPlaylistIndex = 0;
     // An integer indicating the last recorded state
@@ -171,7 +175,11 @@ watch.on('connection', function(socket) {
     roomObject.lastId = id;
     // Refresh the last content type
     roomObject.lastType = type;
-    if (type === 'youtube#playlist') roomObject.lastPlaylistIndex = 0
+    if (type === 'youtube#playlist') {
+      // Get all videos from the playlist
+      axios.get(playlistItemsUrl + '?part=snippet&maxResults=50&key=' + apiKey + '&playlistId=' + id).then(function(data) { roomObject.playlistItems = data.data.items; watch.to(roomId).emit('playlistItems', data.data.items); });
+      roomObject.lastPlaylistIndex = 0;
+    }
     // Reset lastDuration and countDuration
     roomObject.lastDuration = 0; roomObject.countDuration = true; roomObject.lastDurationTime = time.time();
     // Send the video id to all other users
