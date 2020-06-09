@@ -77,7 +77,7 @@ function displayResults(data) {
   // Clear results div
   resultsDiv.innerHTML = '';
   // The template for creating new video results
-  let divTemplate = document.getElementById('searchResultTemplate').content.querySelector('div');
+  let divTemplate = document.getElementById('videoTemplate').content.querySelector('div');
   // Iterating over every result to add it to the site
   for (result of data) {
     // Create the div for the new video and add it to the class video
@@ -88,11 +88,15 @@ function displayResults(data) {
       const videoId = result.id.videoId;
       resultDiv.addEventListener('click', function() {
         loadVideoById(videoId);
+        externalChange = 3;
+        socket.emit('videoChange', videoId, 'youtube#video');
       });
     } else if (type === 'youtube#playlist') {
       const playlistId = result.id.playlistId;
       resultDiv.addEventListener('click', function() {
         loadPlaylistById(playlistId);
+        externalChange = 3;
+        socket.emit('videoChange', playlistId, 'youtube#playlist');
       });
     }
     // Adding the information of the video
@@ -109,11 +113,40 @@ function displayResults(data) {
 
 // Displays all items of a newly playing playlist under playlist controls
 function displayPlaylistItems(items) {
-  console.log(items);
+  // Get the div where the results will be displayed
+  let itemsDiv = $('#playlistItems');
+  // Clear results div
+  itemsDiv.innerHTML = '';
+  // The template for creating new video results
+  let divTemplate = document.getElementById('videoTemplate').content.querySelector('div');
+  // Iterating over every result to add it to the site
+  for (let i = 0; i < items.length; i++) {
+    let item = items[i];
+    // Create the div for the new video and add it to the class video
+    let itemDiv = document.importNode(divTemplate, true);
+    // Attach the correct event listener
+    const index = i;
+    itemDiv.addEventListener('click', function() {
+      if (index !== player.getPlaylistIndex()) {
+        externalChange = 3;
+        player.playVideoAt(index);
+        socket.emit('playlistIndexChange', index);
+      }
+    });
+    // Adding the information of the video
+    itemDiv.querySelector('img').src = item.snippet.thumbnails.default.url;
+    itemDiv.querySelector('h2').innerHTML = item.snippet.title;
+    itemDiv.querySelector('p').textContent = item.snippet.channelTitle;
+    // Append the result to the div containing all results
+    itemsDiv.append(itemDiv);
+  }
+  adjustTabsMenuHeight();
 }
 
 // Gets called when the user submits a new video id
 function loadVideoById(videoId) {
+  // Clear playlist items div
+  $('#playlistItems').innerHTML = '';
   // If the id doesn't match the current id
   if (videoId !== lastVideoId) {
     // Update the last type
@@ -124,14 +157,16 @@ function loadVideoById(videoId) {
     $('#playlistTab').addClass('disabled');
     // Load the video
     player.loadVideoById(videoId);
-    externalChange = 3;
-    socket.emit('videoChange', videoId, 'youtube#video');
+
   }
 }
 
 function loadPlaylistById(playlistId) {
   // Get the id of the currently playing playlist
-  let currentId = player.getVideoUrl().split('=')[1].slice(0, -2);
+  let currentId;
+  // If a video has been loaded
+  if (player.getVideoUrl().includes('=')) currentId = player.getVideoUrl().split('=')[1].slice(0, -2);
+  else currentId = '';
   if (playlistId !== currentId) {
     // Update the last type
     lastType = 'youtube#playlist';
@@ -139,8 +174,6 @@ function loadPlaylistById(playlistId) {
     $('#playlistTab').removeClass('disabled');
     // Load the playlist
     player.loadPlaylist({list : playlistId});
-    externalChange = 3;
-    socket.emit('videoChange', playlistId, 'youtube#playlist');
   }
 }
 
@@ -209,13 +242,8 @@ socket
 // Gets called whenever another user requests a new video
 .on('videoChange', function(id, type) {
   // Correctly load the new content
-  if (type === 'youtube#video') {
-    player.loadVideoById(id);
-    lastType = 'youtube#video';
-  } else if (type === 'youtube#playlist') {
-    player.loadPlaylist({list : id});
-    lastType = 'youtube#playlist';
-  }
+  if (type === 'youtube#video') loadVideoById(id);
+  else if (type === 'youtube#playlist') loadPlaylistById(id);
 })
 // Gets called whenever another user changes the index of the currently playing playlist video
 .on('playlistIndexChange', function(index) {
