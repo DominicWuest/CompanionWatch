@@ -3,15 +3,16 @@
   <head>
     <meta charset="utf-8">
     <title>Watch</title>
-    <script defer src="/js/socket.io.js" charset="utf-8"></script>
-    <script defer src="/js/jquery.min.js" charset="utf-8"></script>
-    <script defer src="/js/bootstrap.bundle.min.js" charset="utf-8"></script>
-    <script defer src="/js/bootstrap-toggle.min.js" charset="utf-8"></script>
-    <script defer src="/js/jquery.cookie.js" charset="utf-8"></script>
-    <script defer src="/js/bootbox.min.js" charset="utf-8"></script>
-    <script defer src="/js/jquery.easyui.min.js" charset="utf-8"></script>
-    <script defer src="/js/roomWatch.js" charset="utf-8"></script>
-    <script defer src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="/js/socket.io.js" charset="utf-8"></script>
+    <script src="/js/jquery.min.js" charset="utf-8"></script>
+    <script src="/js/bootstrap.bundle.min.js" charset="utf-8"></script>
+    <script src="/js/bootstrap-toggle.min.js" charset="utf-8"></script>
+    <script src="/js/jquery.cookie.js" charset="utf-8"></script>
+    <script src="/js/bootbox.min.js" charset="utf-8"></script>
+    <script src="/js/jquery.easyui.min.js" charset="utf-8"></script>
+    <script src="/js/jquery-ui.min.js" charset="utf-8"></script>
+    <script src="/js/roomWatch.js" charset="utf-8"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/bootstrap-toggle.min.css">
     <link rel="stylesheet" href="/css/roomWatch.css">
@@ -105,7 +106,8 @@
         <div id="queue" class="tab-pane"></div>
         <div id="playlist" class="tab-pane">
           <div class="controls">
-
+            <button type="button" name="rewind" id="rewindButton"></button>
+            <button type="button" name="skip" id="skipButton"></button>
           </div>
           <div id="playlistItems"></div>
         </div>

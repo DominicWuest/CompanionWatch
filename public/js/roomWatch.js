@@ -136,10 +136,11 @@ function displayPlaylistItems(items) {
     // Adding the information of the video
     itemDiv.querySelector('img').src = item.snippet.thumbnails.default.url;
     itemDiv.querySelector('h2').innerHTML = item.snippet.title;
-    itemDiv.querySelector('p').textContent = item.snippet.channelTitle;
     // Append the result to the div containing all results
     itemsDiv.append(itemDiv);
   }
+  // Highlight the div tab if the user hasn't focused it
+  if (!itemsDiv.is(':focus')) $('#playlistTab').effect('highlight', { color : '#ffcc99' }, 3000);
   adjustTabsMenuHeight();
 }
 
