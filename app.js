@@ -118,8 +118,8 @@ watch.on('connection', function(socket) {
   socket
   // Gets called by clients when they want to sync the videoId of their player to the ones of the other clients
   .on('requestVideoSync', function() {
-    socket.emit('videoChange', roomObject.lastId, roomObject.lastType);
-    if (roomObject.lastType === 'youtube#playlist') socket.emit('playlistIndexChange', roomObject.lastPlaylistIndex);
+    socket.emit('videoChange', roomObject.lastId, roomObject.lastType, roomObject.lastPlaylistIndex);
+    if (roomObject.lastType === 'youtube#playlist') socket.emit('playlistItems', roomObject.playlistItems);
   })
   // Sends the visibility of the room to the client
   .on('requestVisibilitySync', function() {

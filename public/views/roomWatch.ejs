@@ -11,7 +11,7 @@
     <script src="/js/bootbox.min.js" charset="utf-8"></script>
     <script src="/js/jquery.easyui.min.js" charset="utf-8"></script>
     <script src="/js/jquery-ui.min.js" charset="utf-8"></script>
-    <script src="/js/roomWatch.js" charset="utf-8"></script>
+    <script src="/js/roomWatch.js" charset="utf-8" defer></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/bootstrap-toggle.min.css">
@@ -105,9 +105,19 @@
         <div id="resultsDiv" class="tab-pane"></div>
         <div id="queue" class="tab-pane"></div>
         <div id="playlist" class="tab-pane">
-          <div class="controls">
-            <button type="button" name="rewind" id="rewindButton"></button>
-            <button type="button" name="skip" id="skipButton"></button>
+          <div class="container playlistControls">
+            <div class="row justify-content-md-center">
+              <div class="col-md-auto">
+                <button type="button" name="rewind" class="btn btn-link" id="rewindButton" onclick="playPreviousVideo();"><img src="/imgs/skip-backward-fill.svg"></button>
+              </div>
+              <div class="col-md-auto">
+                <button type="button" name="play" class="btn btn-link d-none" id="playButton" onclick="player.playVideo();"><img src="/imgs/play-fill.svg"></button>
+                <button type="button" name="pause" class="btn btn-link" id="pauseButton" onclick="player.pauseVideo();"><img src="/imgs/pause-fill.svg"></button>
+              </div>
+              <div class="col-md-auto">
+                <button type="button" name="skip" class="btn btn-link" id="skipButton" onclick="playNextVideo();"><img src="/imgs/skip-forward-fill.svg"></button>
+              </div>
+            </div>
           </div>
           <div id="playlistItems"></div>
         </div>

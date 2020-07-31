@@ -94,7 +94,7 @@ function displayResults(data) {
     } else if (type === 'youtube#playlist') {
       const playlistId = result.id.playlistId;
       resultDiv.addEventListener('click', function() {
-        loadPlaylistById(playlistId);
+        loadPlaylistById(playlistId, 0);
         externalChange = 3;
         socket.emit('videoChange', playlistId, 'youtube#playlist');
       });
@@ -158,11 +158,10 @@ function loadVideoById(videoId) {
     $('#playlistTab').addClass('disabled');
     // Load the video
     player.loadVideoById(videoId);
-
   }
 }
 
-function loadPlaylistById(playlistId) {
+function loadPlaylistById(playlistId, index) {
   // Get the id of the currently playing playlist
   let currentId;
   // If a video has been loaded
@@ -174,8 +173,16 @@ function loadPlaylistById(playlistId) {
     // Enable the playlist controls tab
     $('#playlistTab').removeClass('disabled');
     // Load the playlist
-    player.loadPlaylist({list : playlistId});
+    player.loadPlaylist({list : playlistId, index : index});
   }
+}
+
+function playPreviousVideo() {
+
+}
+
+function playNextVideo() {
+  
 }
 
 // Gets called when the user wants to send a message
@@ -241,10 +248,10 @@ socket
   } else player.seekTo(data, true);
 })
 // Gets called whenever another user requests a new video
-.on('videoChange', function(id, type) {
+.on('videoChange', function(id, type, lastPlaylistIndex) {
   // Correctly load the new content
   if (type === 'youtube#video') loadVideoById(id);
-  else if (type === 'youtube#playlist') loadPlaylistById(id);
+  else if (type === 'youtube#playlist') loadPlaylistById(id, lastPlaylistIndex);
 })
 // Gets called whenever another user changes the index of the currently playing playlist video
 .on('playlistIndexChange', function(index) {
