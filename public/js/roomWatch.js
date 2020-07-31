@@ -177,12 +177,14 @@ function loadPlaylistById(playlistId, index) {
   }
 }
 
+// Plays the previous video in the playlist currently being played
 function playPreviousVideo() {
   externalChange = 3;
   player.previousVideo();
   socket.emit('playlistIndexChange', player.getPlaylistIndex() - 1);
 }
 
+// Plays the next video in the playlist currently being played
 function playNextVideo() {
   externalChange = 3;
   player.nextVideo();
