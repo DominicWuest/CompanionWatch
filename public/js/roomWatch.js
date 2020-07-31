@@ -37,8 +37,8 @@ if (!$.cookie('firstTime')) {
 // Connect to the socket
 let socket = io.connect(window.location.origin + '/watch', {query : 'ns=' + window.location.href.split('/').slice(-1)[0]});
 
-// An indicating whether the change of the state got caused by the user or an external client, positive means external change, negative means internal change
-let externalChange = 0;
+// An integer indicating whether the change of the state should be ignored or not, greater than 0 means ignore change, otherwise process change, gets decremented after every statechange event
+let ignoreChange = 0;
 
 // An integer indicating the last state the player was in
 let lastState = -2;
@@ -88,14 +88,14 @@ function displayResults(data) {
       const videoId = result.id.videoId;
       resultDiv.addEventListener('click', function() {
         loadVideoById(videoId);
-        externalChange = 3;
+        ignoreChange = 3;
         socket.emit('videoChange', videoId, 'youtube#video');
       });
     } else if (type === 'youtube#playlist') {
       const playlistId = result.id.playlistId;
       resultDiv.addEventListener('click', function() {
         loadPlaylistById(playlistId, 0);
-        externalChange = 3;
+        ignoreChange = 3;
         socket.emit('videoChange', playlistId, 'youtube#playlist');
       });
     }
@@ -128,7 +128,7 @@ function displayPlaylistItems(items) {
     const index = i;
     itemDiv.addEventListener('click', function() {
       if (index !== player.getPlaylistIndex()) {
-        externalChange = 3;
+        ignoreChange = 3;
         player.playVideoAt(index);
         socket.emit('playlistIndexChange', index);
       }
@@ -179,14 +179,14 @@ function loadPlaylistById(playlistId, index) {
 
 // Plays the previous video in the playlist currently being played
 function playPreviousVideo() {
-  externalChange = 3;
+  ignoreChange = 3;
   player.previousVideo();
   socket.emit('playlistIndexChange', player.getPlaylistIndex() - 1);
 }
 
 // Plays the next video in the playlist currently being played
 function playNextVideo() {
-  externalChange = 3;
+  ignoreChange = 3;
   player.nextVideo();
   socket.emit('playlistIndexChange', player.getPlaylistIndex() + 1);
 }
@@ -241,12 +241,12 @@ socket
     case 1: player.playVideo(); break;
     case 2: player.pauseVideo(); break;
   }
-  if ([1, 2].includes(data)) externalChange = true;
+  if ([1, 2].includes(data)) ignoreChange = true;
 })
 // Gets called whenever another user changes the time of the video or the user requests to sync the time
 .on('timeChange', function(data) {
   // If the time isn't zero and the player hasn't started playing yet
-  if (data !== 0 && player.getPlayerState() !== 3) externalChange = 2;
+  if (data !== 0 && player.getPlayerState() !== 3) ignoreChange = 2;
   // If the video has finished
   if (data >= player.getDuration()) {
     player.seekTo(0, false);
@@ -261,7 +261,7 @@ socket
 })
 // Gets called whenever another user changes the index of the currently playing playlist video
 .on('playlistIndexChange', function(index) {
-  externalChange = 3;
+  ignoreChange = 3;
   player.playVideoAt(index);
 })
 // Synchronises shwon visibility for clients
@@ -299,7 +299,7 @@ function startVideo() {
 function synchPlayerStates(data) {
   let state = data.data;
   // Only emit events if the change doesn't come from an emitted event itself
-  if (externalChange < 1) {
+  if (ignoreChange < 1) {
     if (state === 2) lastTime = player.getCurrentTime();
     else if (state === 1 && lastTime !== player.getCurrentTime()) socket.emit('timeChange', player.getCurrentTime());
     // Synch the states of the clients players if the user stopped or resumed the video
@@ -319,8 +319,8 @@ function synchPlayerStates(data) {
       $('#pauseButton').addClass('d-none');
     }
   }
-  // Decrement the externalchange variable
-  externalChange--;
+  // Decrement the ignoreChange variable
+  ignoreChange--;
   // Set the last state to the current state
   lastState = state;
 }
