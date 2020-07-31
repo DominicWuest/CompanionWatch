@@ -178,11 +178,15 @@ function loadPlaylistById(playlistId, index) {
 }
 
 function playPreviousVideo() {
-
+  externalChange = 3;
+  player.previousVideo();
+  socket.emit('playlistIndexChange', player.getPlaylistIndex() - 1);
 }
 
 function playNextVideo() {
-  
+  externalChange = 3;
+  player.nextVideo();
+  socket.emit('playlistIndexChange', player.getPlaylistIndex() + 1);
 }
 
 // Gets called when the user wants to send a message
@@ -302,6 +306,16 @@ function synchPlayerStates(data) {
     if (state === 3 && lastState !== -1 && lastState !== -2) socket.emit('timeChange', player.getCurrentTime());
     // Catch changes of playlist video
     if (lastType === 'youtube#playlist' && state === -1) socket.emit('playlistIndexChange', player.getPlaylistIndex());
+  }
+  // Display the correct button (play / pause) in playlist controls
+  if (lastType === 'youtube#playlist') {
+    if (state === 1) {
+      $('#playButton').addClass('d-none');
+      $('#pauseButton').removeClass('d-none');
+    } else {
+      $('#playButton').removeClass('d-none');
+      $('#pauseButton').addClass('d-none');
+    }
   }
   // Decrement the externalchange variable
   externalChange--;
