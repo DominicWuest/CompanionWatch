@@ -260,3 +260,17 @@ a:hover {
   grid-area: cn;
   font-size: 1rem;
 }
+
+#playlist {
+  padding: 1vh 2vw;
+  margin: 0;
+}
+
+.playlistControls .col-md-auto {
+  padding: 0;
+}
+
+.playlistControls .btn img {
+  width: 32px;
+  height: 32px;
+}
