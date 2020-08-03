@@ -16,14 +16,6 @@ html {
     border: thin rgba(0, 0, 0, .25) solid;
 }
 
-#playercontainer {
-  height: 100%;
-  padding-bottom: 3vh;
-  box-sizing: border-box;
-  max-height: 72vh;
-  overflow: hidden;
-}
-
 #player {
   display: block;
   position: relative;
@@ -32,60 +24,13 @@ html {
   overflow: hidden;
 }
 
-:root {
-  --input-padding-x: 1.5rem;
-  --input-padding-y: 0.75rem;
+#messages {
+  overflow-y: scroll;
 }
 
-.form-label-group > input {
-  padding: var(--input-padding-y) var(--input-padding-x);
-  height: auto;
-  border-radius: 2rem;
-}
-
-#tabs {
-  width: 100vw;
-  border-top: thin solid rgba(0, 0, 0, 0.125);
-  background-color: white;
-}
-
-.tab-content {
-  overflow-y: auto;
-  margin: 0 auto;
-  padding: 0;
-  width: auto;
-}
-
-#chat {
-  height: 100%;
-}
-
-.chatChild {
-  padding-left: 2vw;
-  box-sizing: border-box;
-  width: 100%;
-  height: 100%;
+.chat {
   display: grid;
   grid-template-rows: 1fr auto;
-}
-
-#messages {
-  width: 100%;
-  overflow-y: scroll;
-  padding: 0;
-  padding-top: 2vh;
-  padding-right: 3vw;
-}
-
-.messageWrapper {
-  width: 100%;
-  float: left;
-  clear: both;
-}
-
-.messageWrapper h4 {
-  grid-row: 2;
-  display: inline;
 }
 
 .speech-bubble {
@@ -112,78 +57,25 @@ html {
   margin-bottom: -0.5em;
 }
 
-.own-message h4 {
-  float: right;
-  margin-left: 0.2vw;
-  font-size: 1rem;
-}
-
-.own-message h4:first-of-type {
-  clear: right;
-}
-
-.own-message div {
+.speech-bubble-right {
   border-bottom-right-radius: 0;
-  float: right;
 }
 
-.own-message .speech-bubble:after {
+.speech-bubble-right:after {
   border-right: 0;
   right: 0;
 }
 
-.foreign-message div {
-  float: left;
-  clear: both;
+.speech-bubble-left {
   border-bottom-left-radius: 0;
 }
 
-.foreign-message div:after {
-  left: 0;
-  transform: translateX(50%);
+.speech-bubble-left:after {
   border-left: 0;
+  left: 4px;
 }
 
-.foreign-message h4 {
-  float: left;
-  margin-right: 0.2vw;
-  font-size: 1rem;
-}
-
-.foreign-message h4:first-of-type {
-  clear: left;
-}
-
-.chatInput {
-  height: 100%;
-  width: 100%;
-  display: grid;
-  grid-template-columns: 19fr 1fr;
-  grid-column-gap: 1%;
-  box-sizing: border-box;
-  padding: 1vh 0;
-  padding-right: 2vw;
-}
-
-.chatInput * {
-  border-radius: 1vh;
-}
-
-.chatInput input {
-  font-size: 1.5em;
-  height: 100%;
-}
-
-#playlist {
-  padding: 1vh 2vw;
-  margin: 0;
-}
-
-.playlistControls .col-md-auto {
-  padding: 0;
-}
-
-.playlistControls .btn img {
+#playlist .btn img {
   width: 32px;
   height: 32px;
 }

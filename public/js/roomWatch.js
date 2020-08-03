@@ -217,7 +217,7 @@ function addMessage(ownMessage, username, message) {
   if (ownMessage) var template = document.getElementById('ownMessageTemplate');
   else var template = document.getElementById('foreignMessageTemplate')
   // Get the template
-  let messageTemplate = template.content.querySelector('.messageWrapper');
+  let messageTemplate = template.content.querySelector('.message');
   let messageDiv = document.importNode(messageTemplate, true);
   // Set the text for the message, username and timestamp
   messageDiv.querySelector('.speech-bubble').textContent = message;
