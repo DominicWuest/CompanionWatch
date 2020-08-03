@@ -56,15 +56,18 @@ const logger = winston.createLogger({
   ]
 });
 
+// Create date object for logging timestamps of events
+var date = new Date();
+
 // Routing for the homepage
 app.get('/', function(req, res) {
-  logger.info('GET-Request to / by %s', req.ip);
+  logger.info('[%d:%d] GET-Request to / by %s', date.getHours(), date.getMinutes(), req.ip);
   res.render('index.ejs', { rooms : publicRoomIds.map(roomId => rooms[roomId]) });
 });
 
 // Routing for creating a new room
 app.post('/newroom', function(req, res) {
-  logger.info('POST-Request to /newroom by %s', req.ip);
+  logger.info('[%d:%d] POST-Request to /newroom by %s', date.getHours(), date.getMinutes(), req.ip);
   // Create a random string to use as the rooms id
   let roomId = Math.random().toString(36).substring(2);
   // Ensure it isn't a duplicate id
@@ -72,7 +75,7 @@ app.post('/newroom', function(req, res) {
   // Create the new room object and push it and its id to the rooms array
   let newRoom = new Room(roomId);
   rooms[roomId] = newRoom;
-  logger.info('New Room with ID %s created', roomId)
+  logger.info('[%d:%d] New Room with ID %s created', date.getHours(), date.getMinutes(), roomId)
   // Get and update the snippet for the video playing in the room
   axios.get(videoInfoUrl + '?part=snippet&key=' + apiKey + '&id=' + newRoom.lastId).then(data => newRoom.snippet = data.data.items[0].snippet);
   res.send('/watch/' + roomId);
@@ -80,7 +83,7 @@ app.post('/newroom', function(req, res) {
 
 // Routing for the page where clients can watch videos together
 app.get(new RegExp('/watch/(.+)'), function(req, res) {
-  logger.info('GET-Request to %s by %s', req.path, req.ip);
+  logger.info('[%d:%d] GET-Request to %s by %s', date.getHours(), date.getMinutes(), req.path, req.ip);
   res.render('roomWatch.ejs', {});
 });
 
@@ -131,7 +134,7 @@ let publicRoomIds = [];
 watch.on('connection', function(socket) {
   // The room to which the client is connected
   let roomId = url.parse(socket.handshake.url, true).query.ns;
-  logger.info('%s connected to room with room ID %s (IP : %s)', socket.id, roomId, socket.conn.remoteAddress.split(":")[3]);
+  logger.info('[%d:%d] %s connected to room with room ID %s (IP : %s)', date.getHours(), date.getMinutes(), socket.id, roomId, socket.conn.remoteAddress.split(":")[3]);
   // Disconnect the user if he joins from an invalid room
   if (!(roomId in rooms)) {
     socket.disconnect();
@@ -188,7 +191,7 @@ watch.on('connection', function(socket) {
   })
   // Gets called whenever the user wants to search for a video
   .on('videoSearch', function(queryString) {
-    logger.info('%s sent search query "%s" from room with room ID %s (IP : %s)', socket.id, queryString, roomId, socket.conn.remoteAddress.split(":")[3]);
+    logger.info('[%d:%d] %s sent search query "%s" from room with room ID %s (IP : %s)', date.getHours(), date.getMinutes(), socket.id, queryString, roomId, socket.conn.remoteAddress.split(":")[3]);
     // The full URL to call for the query
     let requestUrl = videoSearchUrl + '?part=id,snippet&q=' + encodeURI(queryString).replace(/%20/g, '+') + videoSearchParams + '&key=' + apiKey;
     // Sending the request and immediately sending the result to the user
@@ -238,7 +241,7 @@ watch.on('connection', function(socket) {
   })
   // Gets called whenever a user sends a message
   .on('newMessage', function(username, message) {
-    logger.info('%s sent message "%s" with username "%s" to room with room ID %s (IP : %s)', socket.id, message, username, roomId, socket.conn.remoteAddress.split(":")[3]);
+    logger.info('[%d:%d] %s sent message "%s" with username "%s" to room with room ID %s (IP : %s)', date.getHours(), date.getMinutes(), socket.id, message, username, roomId, socket.conn.remoteAddress.split(":")[3]);
     socket.broadcast.to(roomId).emit('newMessage', username, message);
   })
   // Decrement the amount of connected clients when one disconnects
