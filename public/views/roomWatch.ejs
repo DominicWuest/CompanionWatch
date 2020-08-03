@@ -9,7 +9,7 @@
     <script src="/js/bootstrap-toggle.min.js" charset="utf-8"></script>
     <script src="/js/jquery.cookie.js" charset="utf-8"></script>
     <script src="/js/bootbox.min.js" charset="utf-8"></script>
-    <script src="/js/jquery.easyui.min.js" charset="utf-8"></script>
+    <script defer src="/js/jquery.easyui.min.js" charset="utf-8"></script>
     <script src="/js/jquery-ui.min.js" charset="utf-8"></script>
     <script src="/js/roomWatch.js" charset="utf-8" defer></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -34,113 +34,130 @@
       }
     });
   ">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
-      <div class="container">
-        <a class="navbar-brand" href="/">Companion Watch</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-          <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="/">Home
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" onclick="createRoom()">Create Room</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/contact">Contact</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-    <main>
-      <div class="form-label-group videoSearch">
-        <input type="text" id="videoQuery" class="form-control" placeholder="Search for YouTube Videos" onkeyup="if(event.key==='Enter')onVideoSearch()" autocomplete="off">
-        <button type="button" class="btn btn-lg btn-primary btn-block videoSearchButton" name="videoSearch" onclick="onVideoSearch()">Search</button>
-      </div>
-      <label class="visibilityToggleWrapper">
-        <span>Room visibility:</span>
-        <input id="visibilityToggle" type="checkbox" data-toggle="toggle" data-on="Public" data-off="Private" onchange="changeVisibility(this.checked);">
-      </label>
-      <div id="playercontainer" class="easyui-resizable">
-        <div id="player"></div>
-      </div>
-      <script type="text/javascript">
-        var tag = document.createElement('script');
-
-        tag.src = "https://www.youtube.com/iframe_api";
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-        var player;
-        function onYouTubeIframeAPIReady() {
-          player = new YT.Player('player', {
-            height: '390',
-            width: '640',
-            events: {
-              'onReady': startVideo
-            }
-          });
-        }
-      </script>
-      <ul id="tabs" class="nav nav-tabs">
-        <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#chat" id="chatTab">Chat</a></li>
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#resultsDiv" id="resultsDivTab">Video Results</a></li>
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#queue" id="queueTab">Queue</a></li>
-        <li class="nav-item"><a class="nav-link disabled" data-toggle="tab" href="#playlist" id="playlistTab">Playlist Controls</a></li>
-      </ul>
-      <div class="tab-content">
-        <div id="chat" class="tab-pane active">
-          <div class="chatChild">
-            <div id="messages"></div>
-            <div class="chatInput">
-              <input type="text" id="messageInput" class="form-control" placeholder="Type your message..." onkeyup="if (event.key==='Enter') sendMessage()" autocomplete="off">
-              <button type="button" class="btn btn-lg btn-primary btn-block" name="sendMessage" onclick="sendMessage()"><img src="/imgs/sendMessage.png"></button>
-            </div>
+    <div class="container-fluid p-0">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+        <div class="container-fluid m-1">
+          <a class="navbar-brand" href="/">Companion Watch</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+              <li class="nav-item">
+                <a class="nav-link btn btn-link" href="/">Home
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link btn btn-link" onclick="createRoom()" href="">Create Room</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link btn btn-link" href="/contact">Contact</a>
+              </li>
+            </ul>
           </div>
         </div>
-        <div id="resultsDiv" class="tab-pane"></div>
-        <div id="queue" class="tab-pane"></div>
-        <div id="playlist" class="tab-pane">
-          <div class="container playlistControls">
-            <div class="row justify-content-md-center">
-              <div class="col-md-auto">
-                <button type="button" name="rewind" class="btn btn-link" id="rewindButton" onclick="playPreviousVideo();"><img src="/imgs/skip-backward-fill.svg"></button>
-              </div>
-              <div class="col-md-auto">
-                <button type="button" name="play" class="btn btn-link d-none" id="playButton" onclick="player.playVideo();"><img src="/imgs/play-fill.svg"></button>
-                <button type="button" name="pause" class="btn btn-link" id="pauseButton" onclick="player.pauseVideo();"><img src="/imgs/pause-fill.svg"></button>
-              </div>
-              <div class="col-md-auto">
-                <button type="button" name="skip" class="btn btn-link" id="skipButton" onclick="playNextVideo();"><img src="/imgs/skip-forward-fill.svg"></button>
+      </nav>
+    </div>
+    <div class="container-fluid px-0">
+      <main>
+        <div class="container-fluid row p-5 centered">
+          <input type="text" id="videoQuery" class="col-8 pl-4 ml-auto mr-5 rounded-pill border border-dark" placeholder="Search for YouTube Videos" onkeyup="if(event.key==='Enter')onVideoSearch()" autocomplete="off">
+          <button type="button" class="btn btn-lg btn-primary btn-block col-2 mr-auto" name="videoSearch" onclick="onVideoSearch()">Search</button>
+        </div>
+        <div class="container-fluid form-check form-check-inline pb-3">
+          <div class="container col-auto">
+            <input type="checkbox" class="form-check-input" id="visibilityToggle" data-toggle="toggle" data-on="Public" data-off="Private" onchange="changeVisibility(this.checked);">
+            <label class="form-check-label ml-2" for="visibilityToggle">Room visibility:</label>
+          </div>
+        </div>
+        <div id="playercontainer" class="easyui-resizable container overflow-hidden pb-4">
+          <div id="player"></div>
+        </div>
+        <script type="text/javascript">
+          var tag = document.createElement('script');
+
+          tag.src = "https://www.youtube.com/iframe_api";
+          var firstScriptTag = document.getElementsByTagName('script')[0];
+          firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+          var player;
+          function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+              height: '390',
+              width: '640',
+              events: {
+                'onReady': startVideo
+              }
+            });
+          }
+        </script>
+        <ul id="tabs" class="nav nav-tabs border-top">
+          <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#chat" id="chatTab">Chat</a></li>
+          <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#resultsDiv" id="resultsDivTab">Video Results</a></li>
+          <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#queue" id="queueTab">Queue</a></li>
+          <li class="nav-item"><a class="nav-link disabled" data-toggle="tab" href="#playlist" id="playlistTab">Playlist Controls</a></li>
+        </ul>
+        <div class="tab-content overflow-auto">
+          <div id="chat" class="tab-pane active h-100">
+            <div class="chat pl-2 h-100">
+              <div id="messages" class="container-fluid pr-3 pt-2"></div>
+              <div class="chatInput py-3 pl-5 row mx-auto input-group input-group-lg rounded">
+                <input type="text" id="messageInput" class="form-control pl-3 col-11 h-100" placeholder="Type your message..." onkeyup="if (event.key==='Enter') sendMessage()" autocomplete="off">
+                <div class="input-group-append col-1 pl-0">
+                  <button type="button" class="btn btn-lg btn-primary px-4" name="sendMessage" onclick="sendMessage()"><img src="/imgs/sendMessage.png"></button>
+                </div>
               </div>
             </div>
           </div>
-          <div id="playlistItems"></div>
+          <div id="resultsDiv" class="tab-pane px-0"></div>
+          <div id="queue" class="tab-pane"></div>
+          <div id="playlist" class="tab-pane">
+            <div class="container">
+              <div class="row justify-content-md-center">
+                <div class="col-md-auto pr-0">
+                  <button type="button" name="rewind" class="btn btn-link" id="rewindButton" onclick="playPreviousVideo();"><img src="/imgs/skip-backward-fill.svg"></button>
+                </div>
+                <div class="col-md-auto px-0">
+                  <button type="button" name="play" class="btn btn-link d-none" id="playButton" onclick="player.playVideo();"><img src="/imgs/play-fill.svg"></button>
+                  <button type="button" name="pause" class="btn btn-link" id="pauseButton" onclick="player.pauseVideo();"><img src="/imgs/pause-fill.svg"></button>
+                </div>
+                <div class="col-md-auto pl-0">
+                  <button type="button" name="skip" class="btn btn-link" id="skipButton" onclick="playNextVideo();"><img src="/imgs/skip-forward-fill.svg"></button>
+                </div>
+              </div>
+            </div>
+            <div id="playlistItems"></div>
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   </body>
   <template id="videoTemplate">
-    <div class="video">
-      <img class="thumbnail">
-      <h2 class="videoTitle"></h2>
-      <p class=channelName""></p>
+    <div class="container-fluid border-bottom mt-4 p-0 pl-4 pb-4">
+      <div class="container-fluid row btn-link" style="cursor: pointer">
+        <img class="img-thumbnail mr-3 col-1">
+        <div class="container col-10 m-0">
+          <h2 class="p-0 col-10"></h2>
+          <p class="p-0 col-10"></p>
+        </div>
+      </div>
     </div>
   </template>
   <template id="ownMessageTemplate">
-    <div class="messageWrapper own-message">
-      <div class="speech-bubble"></div>
-      <h4 class="timestamp"></h4><h4 class="dot">&bull;</h4><h4 class="messageName"></h4>
+    <div class="container p-0 mr-0 text-right message">
+      <div class="clearfix"></div>
+      <div class="speech-bubble speech-bubble-right"></div>
+      <div class="container-fluid text-right p-0">
+        <h4 class="timestamp float-right"></h4><h4 class="dot float-right px-2">&bull;</h4><h4 class="messageName float-right"></h4>
+      </div>
     </div>
   </template>
   <template id="foreignMessageTemplate">
-    <div class="messageWrapper foreign-message">
-      <div class="speech-bubble"></div>
-      <h4 class="messageName"></h4><h4 class="dot">&bull;</h4><h4 class="timestamp"></h4>
+    <div class="container p-0 ml-0 message">
+      <div class="speech-bubble speech-bubble-left"></div>
+      <div class="container row">
+        <h4 class="messageName"></h4><h4 class="dot px-2">&bull;</h4><h4 class="timestamp"></h4>
+      </div>
     </div>
   </template>
 </html>

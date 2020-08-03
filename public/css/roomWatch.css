@@ -1,45 +1,12 @@
-body {
-  width: 100vw;
-  height: 100vh;
-}
-
 html {
   overflow: hidden;
-  width: 100vw;
-}
-
-nav {
-  width: 100vw;
-  box-sizing: border-box;
-}
-
-nav .container {
-  max-width: 95%;
-}
-
-a:hover {
-  cursor: pointer;
-}
-
-.visibilityToggleWrapper {
-  display: flex;
-  margin-left: 50%;
-  transform: translateX(-50%);
-  align-items: center;
-  justify-content: center;
-}
-
-.visibilityToggleWrapper * {
-  display: inline-block;
-}
-
-.visibilityToggleWrapper:first-of-type span {
-  padding-right: 0.5vw;
+  min-width: 95%;
 }
 
 .toggle-off {
     box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
 }
+
 .toggle.off {
     border-color: rgba(0, 0, 0, .25);
 }
@@ -47,26 +14,6 @@ a:hover {
 .toggle-handle {
     background-color: white;
     border: thin rgba(0, 0, 0, .25) solid;
-}
-
-.videoSearch {
-  display: grid;
-  grid-template-columns: 4fr 1fr;
-  grid-column-gap: 30px;
-  padding: 5vh;
-  padding-top: 3vh;
-  height: 5vh;
-  box-sizing: content-box;
-  width: 90vw;
-  margin: 0 auto;
-}
-
-#playercontainer {
-  height: 100%;
-  padding-bottom: 3vh;
-  box-sizing: border-box;
-  max-height: 72vh;
-  overflow: hidden;
 }
 
 #player {
@@ -77,60 +24,13 @@ a:hover {
   overflow: hidden;
 }
 
-:root {
-  --input-padding-x: 1.5rem;
-  --input-padding-y: 0.75rem;
+#messages {
+  overflow-y: scroll;
 }
 
-.form-label-group > input {
-  padding: var(--input-padding-y) var(--input-padding-x);
-  height: auto;
-  border-radius: 2rem;
-}
-
-#tabs {
-  width: 100vw;
-  border-top: thin solid rgba(0, 0, 0, 0.125);
-  background-color: white;
-}
-
-.tab-content {
-  overflow-y: auto;
-  margin: 0 auto;
-  padding: 0;
-  width: auto;
-}
-
-#chat {
-  height: 100%;
-}
-
-.chatChild {
-  padding-left: 2vw;
-  box-sizing: border-box;
-  width: 100%;
-  height: 100%;
+.chat {
   display: grid;
   grid-template-rows: 1fr auto;
-}
-
-#messages {
-  width: 100%;
-  overflow-y: scroll;
-  padding: 0;
-  padding-top: 2vh;
-  padding-right: 3vw;
-}
-
-.messageWrapper {
-  width: 100%;
-  float: left;
-  clear: both;
-}
-
-.messageWrapper h4 {
-  grid-row: 2;
-  display: inline;
 }
 
 .speech-bubble {
@@ -157,120 +57,25 @@ a:hover {
   margin-bottom: -0.5em;
 }
 
-.own-message h4 {
-  float: right;
-  margin-left: 0.2vw;
-  font-size: 1rem;
-}
-
-.own-message h4:first-of-type {
-  clear: right;
-}
-
-.own-message div {
+.speech-bubble-right {
   border-bottom-right-radius: 0;
-  float: right;
 }
 
-.own-message .speech-bubble:after {
+.speech-bubble-right:after {
   border-right: 0;
   right: 0;
 }
 
-.foreign-message div {
-  float: left;
-  clear: both;
+.speech-bubble-left {
   border-bottom-left-radius: 0;
 }
 
-.foreign-message div:after {
-  left: 0;
-  transform: translateX(50%);
+.speech-bubble-left:after {
   border-left: 0;
+  left: 4px;
 }
 
-.foreign-message h4 {
-  float: left;
-  margin-right: 0.2vw;
-  font-size: 1rem;
-}
-
-.foreign-message h4:first-of-type {
-  clear: left;
-}
-
-.chatInput {
-  height: 100%;
-  width: 100%;
-  display: grid;
-  grid-template-columns: 19fr 1fr;
-  grid-column-gap: 1%;
-  box-sizing: border-box;
-  padding: 1vh 0;
-  padding-right: 2vw;
-}
-
-.chatInput * {
-  border-radius: 1vh;
-}
-
-.chatInput input {
-  font-size: 1.5em;
-  height: 100%;
-}
-
-#resultsDiv {
-  padding: 1vh 2vw;
-  margin: 0;
-}
-
-.video {
-  display: grid;
-  grid-template-columns: 120px 1fr;
-  grid-template-areas:
-    "tn title"
-    "tn cn";
-  grid-column-gap: 20px;
-  grid-row-gap: 5px;
-  width: 100%;
-  padding-bottom: 20px;
-  border-bottom: 2px solid #CCC;
-  margin-bottom: 20px;
-}
-
-.video:hover {
-  cursor: pointer;
-}
-
-.thumbnail {
-  grid-area: tn;
-}
-
-.videoTitle {
-  grid-area: title;
-  overflow-wrap: break-word;
-  word-wrap: break-word;
-  display: inline;
-  margin: 0;
-  font-family: sans-serif;
-  font-size: 2rem;
-}
-
-.channelName {
-  grid-area: cn;
-  font-size: 1rem;
-}
-
-#playlist {
-  padding: 1vh 2vw;
-  margin: 0;
-}
-
-.playlistControls .col-md-auto {
-  padding: 0;
-}
-
-.playlistControls .btn img {
+#playlist .btn img {
   width: 32px;
   height: 32px;
 }

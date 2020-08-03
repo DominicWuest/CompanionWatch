@@ -17,39 +17,46 @@
     <link rel="stylesheet" href="/css/bootstrap.min.css">
   </head>
   <body onload="checkRooms();">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
-      <div class="container">
-        <a class="navbar-brand" href="/">Companion Watch</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-          <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="/">Home
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" onclick="createRoom()">Create Room</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/contact">Contact</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-    <main>
-      <div class="buttonWrapper">
-        <button type="button" onclick="createRoom()" class="btn btn-lg btn-primary btn-block">Create Room</button>
-      </div>
-      <div id="roomWrapper">
-        <% for (room of rooms) { %>
-          <div class="room">
-            <a class="roomLink" href="/watch/<%= room.roomId %>"><img src="<% if (room.snippet) { %><%= room.snippet.thumbnails.default.url %><% } else { %><%= '/imgs/noThumbnail.png' %><% } %>"><% if (room.snippet) { %><%= room.snippet.title %><% } else { %><%= 'Title not loaded' %><% } %></a><p class="clientCount">Companions: <%= room.connectedClients %></p>
+    <div class="container-fluid p-0">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+        <div class="container-fluid m-1">
+          <a class="navbar-brand" href="/">Companion Watch</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+              <li class="nav-item">
+                <a class="nav-link btn btn-link" href="/">Home
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link btn btn-link" onclick="createRoom()" href="">Create Room</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link btn btn-link" href="/contact">Contact</a>
+              </li>
+            </ul>
           </div>
-        <% } %>
-      </div>
-    </main>
+        </div>
+      </nav>
+    </div>
+    <div class="container-fluid p-0">
+      <main>
+        <div class="container-fluid px-4 pt-4 pb-0">
+          <button type="button" onclick="createRoom()" class="btn btn-lg btn-primary btn-block">Create Room</button>
+        </div>
+        <div class="container-fluid px-5" id="roomWrapper">
+          <div class="container-fluid mt-5 text-center d-none" id="noRooms">
+            <h1>Currently there are no public rooms</h1>
+          </div>
+          <% for (room of rooms) { %>
+            <div class="container-fluid border-bottom mt-4 p-0 room">
+              <a class="btn btn-link btn-lg p-0" href="/watch/<%= room.roomId %>"><img class="img-thumbnail mr-3" src="<% if (room.snippet) { %><%= room.snippet.thumbnails.default.url %><% } else { %><%= '/imgs/noThumbnail.png' %><% } %>"><% if (room.snippet) { %><%= room.snippet.title %><% } else { %><%= 'Title not loaded' %><% } %></a><p class="m-1">Companions: <%= room.connectedClients %></p>
+            </div>
+          <% } %>
+        </div>
+      </main>
+    </div>
   </body>
 </html>

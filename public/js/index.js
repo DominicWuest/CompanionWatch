@@ -17,7 +17,7 @@ function checkRooms() {
   // Check if there are any rooms available
   let rooms = document.getElementsByClassName('room');
   // If there are zero rooms
-  if (!rooms.length) document.getElementById('roomWrapper').innerHTML = '<p class="noRoomsMessage">Currently there are no existing rooms</p>';
+  if (!rooms.length) $('#noRooms').removeClass('d-none');
 }
 
 // A function which creates a new room and redirects the user to it
