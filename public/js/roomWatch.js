@@ -140,7 +140,7 @@ function displayPlaylistItems(items) {
     itemsDiv.append(itemDiv);
   }
   // Highlight the div tab if the user hasn't focused it
-  if (!itemsDiv.is(':focus')) $('#playlistTab').effect('highlight', { color : '#ffcc99' }, 3000);
+  if (!$('#playlistTab').hasClass('active')) $('#playlistTab').effect('highlight', { color : '#ffcc99' }, 3000);
   adjustTabsMenuHeight();
 }
 
@@ -228,6 +228,8 @@ function addMessage(ownMessage, username, message) {
   messagesDiv.append(messageDiv);
   // Scroll to bottom if needed
   if (scrollToBottom) messagesDiv.scrollTop(messagesDiv[0].scrollHeight);
+  // Highlight the div tab if the user hasn't focused it
+  if (!ownMessage && !$('#chatTab').hasClass('active')) $('#chatTab').effect('highlight', { color : '#ffcc99' }, 3000);
 }
 
 // Socket message listeners
