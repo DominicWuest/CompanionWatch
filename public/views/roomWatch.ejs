@@ -91,13 +91,13 @@
             });
           }
         </script>
-        <ul id="tabs" class="nav nav-tabs border-top">
+        <ul id="tabs" class="nav nav-tabs border-top" onclick="$('#tabContent').scrollTop(0);">
           <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#chat" id="chatTab">Chat</a></li>
           <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#resultsDiv" id="resultsDivTab">Video Results</a></li>
           <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#queue" id="queueTab">Queue</a></li>
           <li class="nav-item"><a class="nav-link disabled" data-toggle="tab" href="#playlist" id="playlistTab">Playlist Controls</a></li>
         </ul>
-        <div class="tab-content overflow-auto">
+        <div class="tab-content overflow-auto" id="tabContent">
           <div id="chat" class="tab-pane active h-100">
             <div class="chat pl-2 h-100">
               <div id="messages" class="container-fluid pr-3 pt-2"></div>
