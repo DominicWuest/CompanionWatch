@@ -87,9 +87,28 @@ html {
   left: 4px;
 }
 
+#playlist {
+  height: 100%;
+}
+
+#playlist > .container-fluid {
+  height: 100%;
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+
+#playlist > .container-fluid .container {
+  grid-row: 1;
+}
+
 #playlist .btn img {
   width: 32px;
   height: 32px;
+}
+
+#playlistItems {
+  overflow-y: scroll;
+  grid-row: 0;
 }
 
 .btn-primary {
