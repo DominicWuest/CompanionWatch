@@ -75,7 +75,7 @@ function displayResults(data) {
   // Get the div where the results will be displayed
   let resultsDiv = $('#resultsDiv');
   // Clear results div
-  resultsDiv.innerHTML = '';
+  resultsDiv.html('');
   // The template for creating new video results
   let divTemplate = document.getElementById('videoTemplate').content.querySelector('div');
   // Iterating over every result to add it to the site
