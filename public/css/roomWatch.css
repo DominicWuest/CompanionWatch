@@ -24,6 +24,14 @@ html {
   overflow: hidden;
 }
 
+.nav-tabs {
+  background-color: #F7F7F7;
+}
+
+.tab-content {
+  background-color: #F0F0F0;
+}
+
 #messages {
   overflow-y: scroll;
 }
@@ -33,10 +41,14 @@ html {
   grid-template-rows: 1fr auto;
 }
 
+#messageInput {
+  background-color: #F7F7F7;
+}
+
 .speech-bubble {
   display: inline-block;
 	position: relative;
-	background: #00aabb;
+	background: #00AABB;
 	border-radius: .4em;
   padding: 0.5rem;
   width: auto;
