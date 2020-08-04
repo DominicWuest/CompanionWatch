@@ -43,8 +43,12 @@
     </div>
     <div class="container-fluid p-0">
       <main>
-        <div class="container-fluid px-4 pt-4 pb-0 w-75">
-          <button type="button" onclick="createRoom()" class="btn btn-lg btn-primary btn-block">Create Room</button>
+        <div class="container px-4 pt-4 pb-0 mx-auto row">
+          <button type="button" onclick="createRoom()" class="btn btn-lg btn-primary btn-block col-7">Create Room</button>
+          <div class="d-flex align-items-center col-1 mb-0">
+            <p class="h3 mb-0 mx-auto">or</p>
+          </div>
+          <a href="#" class="btn btn-lg btn-primary btn-block col-4 mt-0 btn-perm">Rent permanent Room</a>
         </div>
         <div class="container-fluid px-5" id="roomWrapper">
           <div class="container-fluid mt-5 text-center d-none" id="noRooms">

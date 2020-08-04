@@ -19,6 +19,16 @@ html {
   border-color: #319B7F !important;
 }
 
+.btn-perm {
+  background-color: #08839B !important;
+  border-color: #08839B !important;
+}
+
+.btn-perm:hover, .btn-perm:active {
+  background-color: #077288 !important;
+  border-color: #077288 !important;
+}
+
 .border-bottom {
   border-color: #748BA2 !important;
 }
