@@ -79,3 +79,22 @@ html {
   width: 32px;
   height: 32px;
 }
+
+.btn-primary {
+  background-color: #3BBA98;
+  border-color: #3BBA98;
+  color: white !important;
+}
+
+.btn-primary:hover, .btn-primary:active {
+  background-color: #319B7F !important;
+  border-color: #319B7F !important;
+}
+
+.border-bottom {
+  border-color: #748BA2 !important;
+}
+
+.img-thumbnail {
+  border-color: #888;
+}

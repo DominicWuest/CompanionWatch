@@ -13,8 +13,8 @@
     <script type="text/javascript">
       let rooms = <%- JSON.stringify(rooms) %>;
     </script>
-    <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/index.css">
   </head>
   <body onload="checkRooms();">
     <div class="container-fluid p-0">
@@ -43,7 +43,7 @@
     </div>
     <div class="container-fluid p-0">
       <main>
-        <div class="container-fluid px-4 pt-4 pb-0">
+        <div class="container-fluid px-4 pt-4 pb-0 w-75">
           <button type="button" onclick="createRoom()" class="btn btn-lg btn-primary btn-block">Create Room</button>
         </div>
         <div class="container-fluid px-5" id="roomWrapper">
@@ -51,7 +51,7 @@
             <h1>Currently there are no public rooms</h1>
           </div>
           <% for (room of rooms) { %>
-            <div class="container-fluid border-bottom mt-4 p-0 room">
+            <div class="container-fluid border-bottom mt-4 p-0 room pb-2">
               <a class="btn btn-link btn-lg p-0" href="/watch/<%= room.roomId %>"><img class="img-thumbnail mr-3" src="<% if (room.snippet) { %><%= room.snippet.thumbnails.default.url %><% } else { %><%= '/imgs/noThumbnail.png' %><% } %>"><% if (room.snippet) { %><%= room.snippet.title %><% } else { %><%= 'Title not loaded' %><% } %></a><p class="m-1">Companions: <%= room.connectedClients %></p>
             </div>
           <% } %>
