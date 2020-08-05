@@ -163,10 +163,9 @@ function loadVideoById(videoId) {
 
 function loadPlaylistById(playlistId, index) {
   // Get the id of the currently playing playlist
-  let currentId;
+  let currentId = '';
   // If a video has been loaded
   if (player.getVideoUrl().includes('=')) currentId = player.getVideoUrl().split('=')[1].slice(0, -2);
-  else currentId = '';
   if (playlistId !== currentId) {
     // Update the last type
     lastType = 'youtube#playlist';
@@ -181,6 +180,7 @@ function loadPlaylistById(playlistId, index) {
 function playPreviousVideo() {
   ignoreChange = 3;
   player.previousVideo();
+  // Sync up the playlist index of the other clients
   socket.emit('playlistIndexChange', player.getPlaylistIndex() - 1);
 }
 
@@ -188,6 +188,7 @@ function playPreviousVideo() {
 function playNextVideo() {
   ignoreChange = 3;
   player.nextVideo();
+  // Sync up the playlist index of the other clients
   socket.emit('playlistIndexChange', player.getPlaylistIndex() + 1);
 }
 
@@ -210,7 +211,7 @@ function sendMessage() {
 // Adds the message to the chat tab
 function addMessage(ownMessage, username, message) {
   let messagesDiv = $('#messages');
-  // Check if user is at bottom of chat
+  // Check if user is at bottom of chat and keep the chat at the bottom if he is
   let scrollToBottom = false;
   if (Math.ceil(messagesDiv.scrollTop() + messagesDiv.innerHeight()) === messagesDiv[0].scrollHeight) scrollToBottom = true;
   // Get the correct template
@@ -243,7 +244,7 @@ socket
     case 1: player.playVideo(); break;
     case 2: player.pauseVideo(); break;
   }
-  if ([1, 2].includes(data)) ignoreChange = true;
+  if ([1, 2].includes(data)) ignoreChange = 1;
 })
 // Gets called whenever another user changes the time of the video or the user requests to sync the time
 .on('timeChange', function(data) {
