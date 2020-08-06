@@ -179,7 +179,10 @@ watch.on('connection', function(socket) {
       if (duration !== roomObject.lastDuration) socket.broadcast.to(roomId).emit('timeChange', duration);
     }
     // If the new state is paused
-    else if (state === 2) roomObject.countDuration = false;
+    else if (state === 2) {
+      roomObject.lastDuration = duration;
+      roomObject.countDuration = false;
+    }
   })
   // Gets called whenever a client changes the time of their video
   .on('timeChange', function(data) {
