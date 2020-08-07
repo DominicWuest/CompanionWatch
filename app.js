@@ -132,8 +132,9 @@ let publicRoomIds = [];
 
 // Gets called when a new clients connects to the socket
 watch.on('connection', function(socket) {
+  let queryString = url.parse(socket.handshake.url, true);
   // The room to which the client is connected
-  let roomId = url.parse(socket.handshake.url, true).query.ns;
+  let roomId = queryString.query.ns;
   logger.info('[%d:%d] %s connected to room with room ID %s (IP : %s)', date.getHours(), date.getMinutes(), socket.id, roomId, socket.conn.remoteAddress.split(":")[3]);
   // Disconnect the user if he joins from an invalid room
   if (!(roomId in rooms)) {
@@ -143,6 +144,10 @@ watch.on('connection', function(socket) {
   else socket.join(roomId);
   // Get the object of the users room
   let roomObject = rooms[roomId];
+  // Add the username to the properties of the connected socket
+  socket.username = queryString.query.un
+  // Send all users the message that a new user joined
+  socket.to(roomId).emit('userJoined', socket.username);
   // Increment the amount of connected clients when a new client connects
   roomObject.connectedClients++;
   socket
@@ -249,7 +254,10 @@ watch.on('connection', function(socket) {
   })
   // Decrement the amount of connected clients when one disconnects
   .on('disconnect', function() {
+    // Decrement the counter of connected clients
     roomObject.connectedClients--;
+    // Send the message that the client left to all other connected clients
+    socket.to(roomId).emit('userDisconnected', socket.username);
     // Delete the room if no clients are connected
     if (roomObject.connectedClients === 0) {
       delete rooms[roomId];

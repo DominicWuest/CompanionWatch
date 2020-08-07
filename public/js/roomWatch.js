@@ -34,8 +34,8 @@ if (!$.cookie('firstTime')) {
   $.cookie('firstTime', '1', { path : '/' });
 }
 
-// Connect to the socket
-let socket = io.connect(window.location.origin + '/watch', {query : 'ns=' + window.location.href.split('/').slice(-1)[0]});
+// Connect to the socket with the params of the namespace and the users username
+let socket = io.connect(window.location.origin + '/watch', {query : 'ns=' + window.location.href.split('/').slice(-1)[0] + '&un=' + $.cookie('username')});
 
 // An integer indicating whether the change of the state should be ignored or not, greater than 0 means ignore change, otherwise process change, gets decremented after every statechange event
 let ignoreChange = 0;
@@ -233,6 +233,26 @@ function addMessage(ownMessage, username, message) {
   if (!ownMessage && !$('#chatTab').hasClass('active')) $('#chatTab').effect('highlight', { color : '#ffcc99' }, 3000);
 }
 
+function addUserConnectionMessage(username, joined) {
+  let messagesDiv = $('#messages');
+  // Check if user is at bottom of chat and keep the chat at the bottom if he is
+  let scrollToBottom = false;
+  if (Math.ceil(messagesDiv.scrollTop() + messagesDiv.innerHeight()) === messagesDiv[0].scrollHeight) scrollToBottom = true;
+  // Get the user joined template
+  let template = document.getElementById('userConnectionTemplate');
+  // Get the template
+  let messageTemplate = template.content.querySelector('.message');
+  let messageDiv = document.importNode(messageTemplate, true);
+  // Set the text for the username
+  messageDiv.querySelector('p').textContent = username + ' just ' + (joined ? 'joined' : 'left');
+  // Append the new message
+  messagesDiv.append(messageDiv);
+  // Scroll to bottom if needed
+  if (scrollToBottom) messagesDiv.scrollTop(messagesDiv[0].scrollHeight);
+  // Highlight the div tab if the user hasn't focused it
+  if (!$('#chatTab').hasClass('active')) $('#chatTab').effect('highlight', { color : '#ffcc99' }, 3000);
+}
+
 // Socket message listeners
 
 socket
@@ -276,7 +296,11 @@ socket
 // Gets called whenever a user changes the video to a playlist, displays the playlist items under playlist controls
 .on('playlistItems', (items) => displayPlaylistItems(items))
 // Gets called whenever another user sends a message
-.on('newMessage', (username, message) => addMessage(false, username, message));
+.on('newMessage', (username, message) => addMessage(false, username, message))
+// Gets called whenever a new user joins the room
+.on('userJoined', (username) => addUserConnectionMessage(username, true))
+// Gets called whenever a user leaves the room
+.on('userDisconnected', (username => addUserConnectionMessage(username, false)));
 
 // Event listeners
 
