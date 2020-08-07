@@ -254,6 +254,8 @@ watch.on('connection', function(socket) {
   })
   // Decrement the amount of connected clients when one disconnects
   .on('disconnect', function() {
+    // Log the event of the user disconnecting
+    logger.info('[%d:%d] %s left room with room ID %s (IP : %s)', date.getHours(), date.getMinutes(), socket.id, roomId, socket.conn.remoteAddress.split(":")[3]);
     // Decrement the counter of connected clients
     roomObject.connectedClients--;
     // Send the message that the client left to all other connected clients
