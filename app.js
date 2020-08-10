@@ -210,7 +210,7 @@ watch.on('connection', function(socket) {
   // Gets called whenever a user requests a new video
   .on('videoChange', function(id, type) {
     // Update the snippet of the room
-    axios.get(type === 'youtube#video' ? videoInfoUrl : playlistInfoUrl + '?part=snippet&key=' + apiKey + '&id=' + id).then(data => roomObject.snippet = data.data.items[0].snippet);
+    axios.get((type === 'youtube#video' ? videoInfoUrl : playlistInfoUrl) + '?part=snippet&key=' + apiKey + '&id=' + id).then(data => roomObject.snippet = data.data.items[0].snippet);
     // Refresh the last id
     roomObject.lastId = id;
     // Refresh the last content type
