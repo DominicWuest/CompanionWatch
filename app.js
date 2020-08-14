@@ -9,6 +9,7 @@ var time = require('time');
 var url = require('url');
 var axios = require('axios');
 var winston = require('winston');
+var fs = require('fs');
 
 // ----------- End of Imports -----------
 
@@ -73,7 +74,7 @@ app.post('/newroom', function(req, res) {
   // Ensure it isn't a duplicate id
   while (roomId in rooms) roomId = Math.random().toString(36).substring(2);
   // Create the new room object and push it and its id to the rooms array
-  let newRoom = new Room(roomId);
+  let newRoom = new Room(roomId, false);
   rooms[roomId] = newRoom;
   logger.info('[%d:%d] New Room with ID %s created', date.getHours(), date.getMinutes(), roomId)
   // Get and update the snippet for the video playing in the room
@@ -92,7 +93,7 @@ var watch = io.of('/watch')
 
 // Class for rooms
 class Room {
-  constructor(roomId) {
+  constructor(roomId, allowEmpty) {
     // The id of the room
     this.roomId = roomId;
     // An integer indicating the time of the video which has passed when the last timeChange was recorded
@@ -115,11 +116,15 @@ class Room {
     this.connectedClients = 0;
     // A boolean indicating whether the room should be seen by others or not
     this.public = false;
-    // Check that the room wasn't created by a bot after .5 seconds (if the amount of connected users equals zero)
-    var that = this;
-    setTimeout(function() {
-      if (that.connectedClients === 0) delete rooms[that.roomId];
-    }, 1000);
+    // If the room is allowed to be empty
+    this.allowEmpty = allowEmpty;
+    if (!this.allowEmpty) {
+      // Check that the room wasn't created by a bot after .5 seconds (if the amount of connected users equals zero)
+      var that = this;
+      setTimeout(function() {
+        if (that.connectedClients === 0) delete rooms[that.roomId];
+      }, 1000);
+    }
   }
 }
 
@@ -128,7 +133,10 @@ let rooms = {};
 // An array contining all rooms that should be displayed publicly and their ids
 let publicRoomIds = [];
 
-// Socket functions
+// Initialises the dev-room
+initialiseDevRoom();
+
+// ------------ Start of Socket Listeners ------------
 
 // Gets called when a new clients connects to the socket
 watch.on('connection', function(socket) {
@@ -260,8 +268,8 @@ watch.on('connection', function(socket) {
     roomObject.connectedClients--;
     // Send the message that the client left to all other connected clients
     socket.to(roomId).emit('userDisconnected', socket.username);
-    // Delete the room if no clients are connected
-    if (roomObject.connectedClients === 0) {
+    // Delete the room if no clients are connected and the room isn't allowed to be empty
+    if (roomObject.connectedClients === 0 && !roomObject.allowEmpty) {
       delete rooms[roomId];
       // Remove the room from the public rooms list if its visibility was public
       if (roomObject.public) {
@@ -271,3 +279,40 @@ watch.on('connection', function(socket) {
     }
   });
 });
+
+// ------------- End of Socket Listeners -------------
+
+// Creates a new room and returns it
+function createRoom(allowEmpty) {
+  // Create a random string to use as the rooms id
+  let roomId = Math.random().toString(36).substring(2);
+  // Ensure it isn't a duplicate id
+  while (roomId in rooms) roomId = Math.random().toString(36).substring(2);
+  // Create the new room object and push it and its id to the rooms array
+  let newRoom = new Room(roomId, true);
+  return newRoom;
+}
+
+// Gets the attributes of the dev room from dev-room.json and intiates it
+function initialiseDevRoom() {
+  // Check if dev-room.json exists
+  fs.stat('dev-room.json', function(err, stat) {
+    // File exists --> read from it
+    if (err == null) {
+      fs.readFile('dev-room.json', (err, data) => {
+          if (err) throw err;
+          let devRoom = JSON.parse(data);
+          rooms[devRoom.roomId] = devRoom;
+      });
+    }
+    // File doesn't exist --> create dev-room
+    else if (err.code === 'ENOENT') {
+      let devRoom = createRoom(true);
+      rooms[devRoom.roomId] = devRoom;
+      logger.info('[%d:%d] Created dev-room with id %s', date.getHours(), date.getMinutes(), devRoom.roomId);
+      // TODO: Add watcher to devRoom
+    }
+    // Some other error
+    else logger.error('[%d:%d] Error reading dev-room.json: %s', date.getHours(), date.getMinutes(), err.code);
+  });
+}
