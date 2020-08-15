@@ -64,7 +64,7 @@ var date = new Date();
 // Routing for the homepage
 app.get('/', function(req, res) {
   logger.info('[%d:%d] GET-Request to / by %s', date.getHours(), date.getMinutes(), req.ip);
-  res.render('index.ejs', { rooms : publicRoomIds.map(roomId => rooms[roomId]) });
+  res.render('index.ejs', { rooms : getPublicRooms() });
 });
 
 // Routing for creating a new room
@@ -81,6 +81,11 @@ app.post('/newroom', function(req, res) {
   // Get and update the snippet for the video playing in the room
   axios.get(videoInfoUrl + '?part=snippet&key=' + apiKey + '&id=' + newRoom.lastId).then(data => newRoom.snippet = data.data.items[0].snippet);
   res.send('/watch/' + roomId);
+});
+
+// Sends all public rooms
+app.get('/rooms', function(req, res) {
+  res.json({ rooms : getPublicRooms() });
 });
 
 // Routing for the page where clients can watch videos together
@@ -282,6 +287,9 @@ watch.on('connection', function(socket) {
 });
 
 // ------------- End of Socket Listeners -------------
+
+// Returns an array of the object of all public rooms
+getPublicRooms = () => publicRoomIds.map(roomId => rooms[roomId]);
 
 // Creates a new room and returns it
 function createRoom(allowEmpty) {
