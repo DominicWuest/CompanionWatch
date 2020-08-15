@@ -313,6 +313,8 @@ function initialiseDevRoom() {
       fs.readFile('dev-room.json', (err, data) => {
           if (err) throw err;
           let devRoom = JSON.parse(data);
+          // Reset some values of the room
+          devRoom.connectedClients = 0; devRoom.lastState = 2; devRoom.countDuration = false;
           rooms[devRoom.roomId] = devRoom;
           attachRoomWatcher(devRoom.roomId, () => saveDevRoom(devRoom.roomId));
           logger.info('[%d:%d] Reinitiated dev-room with id %s', date.getHours(), date.getMinutes(), devRoom.roomId);
