@@ -15,6 +15,7 @@
     "socket.io": "^2.3.0",
     "time": "^0.12.0",
     "url": "^0.11.0",
+    "watchjs": "0.0.0",
     "winston": "^3.3.3"
   },
   "repository": {

@@ -10,6 +10,7 @@ var url = require('url');
 var axios = require('axios');
 var winston = require('winston');
 var fs = require('fs');
+var watchjs = require('watchjs');
 
 // ----------- End of Imports -----------
 
@@ -293,6 +294,16 @@ function createRoom(allowEmpty) {
   return newRoom;
 }
 
+// Attaches a watcher to a room and calls callbackFn whenever the variable changes
+function attachRoomWatcher(roomId, callbackFn) {
+  watchjs.watch(rooms[roomId], () => callbackFn());
+}
+
+// Writes the roomObject of the dev-room to dev-room.json
+function saveDevRoom(roomId) {
+  fs.writeFile('dev-room.json', JSON.stringify(rooms[roomId]), (err) => {});
+}
+
 // Gets the attributes of the dev room from dev-room.json and intiates it
 function initialiseDevRoom() {
   // Check if dev-room.json exists
@@ -303,14 +314,16 @@ function initialiseDevRoom() {
           if (err) throw err;
           let devRoom = JSON.parse(data);
           rooms[devRoom.roomId] = devRoom;
+          attachRoomWatcher(devRoom.roomId, () => saveDevRoom(devRoom.roomId));
+          logger.info('[%d:%d] Reinitiated dev-room with id %s', date.getHours(), date.getMinutes(), devRoom.roomId);
       });
     }
     // File doesn't exist --> create dev-room
     else if (err.code === 'ENOENT') {
       let devRoom = createRoom(true);
       rooms[devRoom.roomId] = devRoom;
+      attachRoomWatcher(devRoom.roomId, () => saveDevRoom(devRoom.roomId));
       logger.info('[%d:%d] Created dev-room with id %s', date.getHours(), date.getMinutes(), devRoom.roomId);
-      // TODO: Add watcher to devRoom
     }
     // Some other error
     else logger.error('[%d:%d] Error reading dev-room.json: %s', date.getHours(), date.getMinutes(), err.code);
