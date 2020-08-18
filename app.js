@@ -85,7 +85,7 @@ app.post('/newroom', function(req, res) {
 
 // Sends all public rooms
 app.get('/rooms', function(req, res) {
-  res.json({ rooms : getPublicRooms() });
+  res.json(getPublicRooms());
 });
 
 // Routing for the page where clients can watch videos together
