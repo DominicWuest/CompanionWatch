@@ -37,6 +37,13 @@ const videoSearchParams = '&safeSearch=none&type=video,playlist&maxResults=20';
 // The api-key for the project
 const apiKey = ***REMOVED***;
 
+// The videoID of the video which plays when creating a new room
+const defaultVideoId = 'hMAPyGoqQVw';
+// Getting the snippet for the default video
+var defaultSnippet;
+axios.get(videoInfoUrl + '?part=snippet&key=' + apiKey + '&id=' + defaultVideoId).then(data =>
+defaultSnippet = data.data.items[0].snippet);
+
 // Setting up the logger
 const logger = winston.createLogger({
   levels : winston.config.syslog.levels,
@@ -77,9 +84,7 @@ app.post('/newroom', function(req, res) {
   // Create the new room object and push it and its id to the rooms array
   let newRoom = new Room(roomId, false);
   rooms[roomId] = newRoom;
-  logger.info('[%d:%d] New Room with ID %s created', date.getHours(), date.getMinutes(), roomId)
-  // Get and update the snippet for the video playing in the room
-  axios.get(videoInfoUrl + '?part=snippet&key=' + apiKey + '&id=' + newRoom.lastId).then(data => newRoom.snippet = data.data.items[0].snippet);
+  logger.info('[%d:%d] New Room with ID %s created', date.getHours(), date.getMinutes(), roomId);
   res.send('/watch/' + roomId);
 });
 
@@ -109,9 +114,11 @@ class Room {
     // A boolean indicating whether the video kept playing since the last time the duration was updated
     this.countDuration = false;
     // A string indicating the id of the last requested video
-    this.lastId = 'hMAPyGoqQVw';
+    this.lastId = defaultVideoId;
     // A string indicating the last type of content playing
     this.lastType = 'youtube#video';
+    // The snippet of the currently playing media
+    this.snippet = defaultSnippet;
     // An array containing all items of the last displayed playlist. Will only be available to user when the playlist is playing
     this.playlistItems;
     // An integer indicating the last index of the video played of a playlist
