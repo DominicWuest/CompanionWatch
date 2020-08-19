@@ -100,7 +100,7 @@ app.get(new RegExp('/watch/(.+)'), function(req, res) {
 });
 
 // Namespace for /watch
-var watch = io.of('/watch')
+var watch = io.of('/watch');
 
 // Class for rooms
 class Room {
@@ -166,7 +166,7 @@ watch.on('connection', function(socket) {
   // Get the object of the users room
   let roomObject = rooms[roomId];
   // Add the username to the properties of the connected socket
-  socket.username = queryString.query.un
+  socket.username = queryString.query.un;
   // Send all users the message that a new user joined
   socket.to(roomId).emit('userJoined', socket.username);
   // Increment the amount of connected clients when a new client connects
@@ -256,11 +256,10 @@ watch.on('connection', function(socket) {
     // Don't do anything if the state itself didn't change
     if (public !== roomObject.public) {
       roomObject.public = public;
-      if (public) {
-        // Add room id to public rooms array
-        publicRoomIds.push(roomId);
-      } else {
-        // Remove the room id from the public rooms array
+      // Add room id to public rooms array if new visibility is public
+      if (public) publicRoomIds.push(roomId);
+      // Remove the room id from the public rooms array if new visibility is private
+      else {
         let publicIndex = publicRoomIds.indexOf(roomId);
         publicRoomIds.splice(publicIndex, 1);
       }
