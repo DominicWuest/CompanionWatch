@@ -289,7 +289,18 @@ watch.on('connection', function(socket) {
 // ------------- End of Socket Listeners -------------
 
 // Returns an array of the object of all public rooms
-getPublicRooms = () => publicRoomIds.map(roomId => rooms[roomId]);
+getPublicRooms = () => publicRoomIds.map(function(roomId) {
+  // Return an object with the important attributes of the room
+  let room = rooms[roomId];
+  return {
+    "roomId" : room.roomId,
+    "connectedClients" : room.connectedClients,
+    "snippet" : {
+      "title" : room.snippet.title,
+      "thumbnails" : room.snippet.thumbnails
+    }
+  };
+});
 
 // Creates a new room and returns it
 function createRoom(allowEmpty) {
