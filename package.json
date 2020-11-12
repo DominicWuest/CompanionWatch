@@ -13,7 +13,7 @@
     "express": "^4.17.1",
     "fs": "0.0.1-security",
     "socket.io": "^2.3.0",
-    "time": "^0.12.0",
+    "time": "github:riyadshauk/node-time",
     "url": "^0.11.0",
     "watchjs": "0.0.0",
     "winston": "^3.3.3"
