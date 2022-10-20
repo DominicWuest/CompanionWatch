@@ -12,7 +12,7 @@
     "ejs": "^3.1.7",
     "express": "^4.17.1",
     "fs": "0.0.1-security",
-    "socket.io": "^2.4.0",
+    "socket.io": "^2.5.0",
     "time": "github:riyadshauk/node-time",
     "url": "^0.11.0",
     "watchjs": "0.0.0",
