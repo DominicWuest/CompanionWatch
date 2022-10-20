@@ -11,11 +11,20 @@ var axios = require('axios');
 var winston = require('winston');
 var fs = require('fs');
 var watchjs = require('watchjs');
+var dotenv = require('dotenv');
 
 // ----------- End of Imports -----------
 
-// Listen on the port 3000
-server.listen(3000);
+dotenv.config();
+
+// Start server
+let port = process.env.PORT || 3000;
+server.listen(port, function (err) {
+	if (err)
+		console.log("Failed to start server: ", err);
+	else
+		console.log("Listening on port ", port);
+});
 
 // Directory for static files
 app.use(express.static('public'));
@@ -35,7 +44,7 @@ const videoSearchUrl = 'https://www.googleapis.com/youtube/v3/search';
 // The parameters for the query
 const videoSearchParams = '&safeSearch=none&type=video,playlist&maxResults=20';
 // The api-key for the project
-const apiKey = ***REMOVED***;
+const apiKey = process.env.API_KEY;
 
 // The videoID of the video which plays when creating a new room
 const defaultVideoId = 'hMAPyGoqQVw';
