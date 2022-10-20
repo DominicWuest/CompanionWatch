@@ -8,7 +8,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^0.21.2",
     "ejs": "^2.7.2",
     "express": "^4.17.1",
     "fs": "0.0.1-security",
